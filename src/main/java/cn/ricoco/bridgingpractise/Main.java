@@ -1,70 +1,80 @@
 package cn.ricoco.bridgingpractise;
 
+import cn.nukkit.Server;
 import cn.nukkit.level.Level;
+import cn.nukkit.level.Position;
+import cn.nukkit.plugin.PluginBase;
 import cn.ricoco.bridgingpractise.Command.RunCommand;
 import cn.ricoco.bridgingpractise.Plugin.MetricsLite;
 import cn.ricoco.bridgingpractise.Utils.FileUtils;
 import cn.ricoco.bridgingpractise.Utils.LevelUtils;
-import cn.nukkit.Server;
-import cn.nukkit.level.Position;
-import cn.nukkit.plugin.PluginBase;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
 
 public class Main extends PluginBase {
+
     public static Main plugin;
+
+    public static Main getPlugin() {
+        return plugin;
+    }
+
+    @Override
+    public void onLoad() {
+        plugin = this;
+    }
+
     @Override
     public void onEnable() {
-        plugin=this;
-        new File("./plugins/BridgingPractise/cache/").mkdirs();
+        new File(this.getDataFolder() + "/cache/").mkdirs();
         try {
-            FileUtils.deldir("./plugins/BridgingPractise/cache/");
+            FileUtils.deldir(this.getDataFolder() + "/cache/");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        new File("./plugins/BridgingPractise/lang/").mkdir();
-        new File("./plugins/BridgingPractise/players/").mkdir();
-        if(!new File("./plugins/BridgingPractise/config.json").exists()){
-            Level deflevel=Server.getInstance().getDefaultLevel();
-            Position ws=deflevel.getSpawnLocation();
-            String cfgpath="./plugins/BridgingPractise/config.json";
-            Position wpos=deflevel.getSafeSpawn();
-            FileUtils.ReadJar("resources/config.json",cfgpath);
-            FileUtils.writeFile(cfgpath,FileUtils.readFile(cfgpath).replaceAll("%1",wpos.x+"").replaceAll("%2",wpos.y+"").replaceAll("%3",wpos.z+"").replaceAll("%4",deflevel.getName()));
+        new File(this.getDataFolder() + "/lang/").mkdir();
+        new File(this.getDataFolder() + "/players/").mkdir();
+        if (!new File(this.getDataFolder() + "/config.json").exists()) {
+            Level deflevel = Server.getInstance().getDefaultLevel();
+            Position ws = deflevel.getSpawnLocation();
+            String cfgpath = this.getDataFolder() + "/config.json";
+            Position wpos = deflevel.getSafeSpawn();
+            FileUtils.ReadJar("resources/config.json", cfgpath);
+            FileUtils.writeFile(cfgpath, FileUtils.readFile(cfgpath).replaceAll("%1", wpos.x + "").replaceAll("%2", wpos.y + "").replaceAll("%3", wpos.z + "").replaceAll("%4", deflevel.getName()));
             LevelUtils.unzip("bpractise");
         }
-        if(!new File("./plugins/BridgingPractise/lang/en_us.json").exists()){
-            FileUtils.ReadJar("resources/lang/en_us.json","./plugins/BridgingPractise/lang/en_us.json");
+        if (!new File(this.getDataFolder() + "/lang/en_us.json").exists()) {
+            FileUtils.ReadJar("resources/lang/en_us.json", this.getDataFolder() + "/lang/en_us.json");
         }
-        if(!new File("./plugins/BridgingPractise/lang/zh_cn.json").exists()){
-            FileUtils.ReadJar("resources/lang/zh_cn.json","./plugins/BridgingPractise/lang/zh_cn.json");
+        if (!new File(this.getDataFolder() + "/lang/zh_cn.json").exists()) {
+            FileUtils.ReadJar("resources/lang/zh_cn.json", this.getDataFolder() + "/lang/zh_cn.json");
         }
-        variable.configjson=JSONObject.parseObject(FileUtils.readFile("./plugins/BridgingPractise/config.json"));
-        String langpath="./plugins/BridgingPractise/lang/"+variable.configjson.getJSONObject("pra").getString("language")+".json";
-        if(!new File(langpath).exists()){
-            plugin.getLogger().warning("LANGUAGE \""+variable.configjson.getJSONObject("pra").getString("language")+".json\" NOT FOUND.LOADING EN_US.json");
-            langpath="./plugins/BridgingPractise/lang/en_us.json";
+        variable.configjson = JSONObject.parseObject(FileUtils.readFile(this.getDataFolder() + "/config.json"));
+        String langpath = this.getDataFolder() + "/lang/" + variable.configjson.getJSONObject("pra").getString("language") + ".json";
+        if (!new File(langpath).exists()) {
+            plugin.getLogger().warning("LANGUAGE \"" + variable.configjson.getJSONObject("pra").getString("language") + ".json\" NOT FOUND.LOADING EN_US.json");
+            langpath = this.getDataFolder() + "/lang/en_us.json";
         }
-        variable.langjson=JSONObject.parseObject(FileUtils.readFile(langpath));
-        variable.disabledmg=variable.configjson.getJSONObject("pra").getJSONArray("disabledmg");
+        variable.langjson = JSONObject.parseObject(FileUtils.readFile(langpath));
+        variable.disabledmg = variable.configjson.getJSONObject("pra").getJSONArray("disabledmg");
         try {
-            FileUtils.Copydir("./worlds/"+variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l")+"/","./plugins/BridgingPractise/cache/");
+            FileUtils.Copydir("./worlds/" + variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l") + "/", this.getDataFolder() + "/cache/");
         } catch (IOException e) {
             e.printStackTrace();
         }
         LevelUtils.loadLevel(variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l"));
         getServer().getPluginManager().registerEvents(new EventLauncher(this), this);
-        plugin.getServer().getCommandMap().register(variable.configjson.getJSONObject("pra").getString("command"),new RunCommand(variable.configjson.getJSONObject("pra").getString("command"),"Bridging Practise"));
-        variable.lowy=variable.configjson.getJSONObject("pos").getDouble("lowy");
+        plugin.getServer().getCommandMap().register(variable.configjson.getJSONObject("pra").getString("command"), new RunCommand(variable.configjson.getJSONObject("pra").getString("command"), "Bridging Practise"));
+        variable.lowy = variable.configjson.getJSONObject("pos").getDouble("lowy");
         PluginTick.StartTick();
         try {
-            new MetricsLite(this,8604);
+            new MetricsLite(this, 8604);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        JSONObject placeBlock=variable.configjson.getJSONObject("block");
+        JSONObject placeBlock = variable.configjson.getJSONObject("block");
         variable.cantPlaceOn.add(placeBlock.getInteger("stop"));
         variable.cantPlaceOn.add(placeBlock.getInteger("res"));
         variable.cantPlaceOn.add(placeBlock.getInteger("speedup"));
@@ -72,19 +82,17 @@ public class Main extends PluginBase {
         variable.cantPlaceOn.add(placeBlock.getInteger("elevator"));
         Server.getInstance().getLogger().info("§eBridgingPractiseNK §fBy §bRicoGG §aSuccessfully Loaded.");
     }
+
     @Override
     public void onDisable() {
         LevelUtils.unloadLevel(variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l"));
         try {
-            FileUtils.deldir("./worlds/"+variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l")+"/");
-            FileUtils.Copydir("./plugins/BridgingPractise/cache/","./worlds/"+variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l")+"/");
-            FileUtils.deldir("./plugins/BridgingPractise/cache/");
-        }catch (IOException e) {
+            FileUtils.deldir("./worlds/" + variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l") + "/");
+            FileUtils.Copydir(this.getDataFolder() + "/cache/", "./worlds/" + variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l") + "/");
+            FileUtils.deldir(this.getDataFolder() + "/cache/");
+        } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    public static Main getPlugin() {
-        return plugin;
     }
 }
 
