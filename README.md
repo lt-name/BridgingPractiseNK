@@ -29,7 +29,7 @@ config.json键值说明:
 block 搭路用方块(id:物品id,d:物品特殊值,c:物品数量)  
 stop 结束点方块id  
 res 重生点设置方块id  
-speedup 加速方块id  
+speedup 加速方块id  (经过此方块会将玩家向前弹射一小段距离)
 backres 回出生点方块id  
 elevator 电梯方块id(需在同一x,z坐标不同高度有2个这种方块,站在其中一个方块上即可传送到另一个)  
 pickaxe 搞(id:物品id,d:物品特殊值)  
@@ -50,9 +50,7 @@ falldmgtip 是否在受到掉落伤害时向玩家发出提示
 iffalllagdmg 是否受到超过阈值的跌落伤害时回到出生点  
 pvpprotect pvp保护  
 candrop 玩家能否扔物品  
-prompt 是否向玩家发送搭路方块速度,距离,最远距离信息的Popup提示  
-speedlv 站在加速方块上获得速度效果的等级  
-speedtick 站在加速方块上获得速度效果的世时间(tick刻)  
+prompt 是否向玩家发送搭路方块速度,距离,最远距离信息的Popup提示
 time 锁定练习区世界的时间  
 weather 锁定练习区世界的天气(clear,rain,thunder)  
 command 搭路练习指令名(/值 join/leave)  
