@@ -139,7 +139,7 @@ public class EventLauncher implements Listener {
                 return;
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("speedup")) {
-                p.addEffect(Effect.getEffect(1).setAmplifier(variable.configjson.getJSONObject("pra").getInteger("speedlv")).setDuration(variable.configjson.getJSONObject("pra").getInteger("speedtick")).setVisible(false));
+                p.setMotion(new Vector3(p.getDirectionVector().x, 0, p.getDirectionVector().z));
                 return;
             }
             int eid = variable.configjson.getJSONObject("block").getInteger("elevator");

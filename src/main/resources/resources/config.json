@@ -24,8 +24,6 @@
         "pvpprotect":false,
         "candrop":false,
         "prompt":true,
-        "speedlv":10,
-        "speedtick":100,
         "time":700,
         "weather":"clear",
         "command":"bpractise",
