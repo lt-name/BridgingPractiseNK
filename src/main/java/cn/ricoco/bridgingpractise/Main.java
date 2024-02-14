@@ -4,6 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.utils.Config;
 import cn.ricoco.bridgingpractise.Command.RunCommand;
 import cn.ricoco.bridgingpractise.Plugin.MetricsLite;
 import cn.ricoco.bridgingpractise.Utils.FileUtils;
@@ -16,6 +17,8 @@ import java.io.IOException;
 public class Main extends PluginBase {
 
     public static Main plugin;
+
+    private PluginConfig pluginConfig;
 
     public static Main getPlugin() {
         return plugin;
@@ -52,28 +55,28 @@ public class Main extends PluginBase {
             FileUtils.ReadJar("resources/lang/zh_cn.json", this.getDataFolder() + "/lang/zh_cn.json");
         }
         variable.configjson = JSONObject.parseObject(FileUtils.readFile(this.getDataFolder() + "/config.json"));
+        this.pluginConfig = new PluginConfig(new Config(this.getDataFolder() + "/config.json", Config.JSON));
+
         String langpath = this.getDataFolder() + "/lang/" + variable.configjson.getJSONObject("pra").getString("language") + ".json";
         if (!new File(langpath).exists()) {
             plugin.getLogger().warning("LANGUAGE \"" + variable.configjson.getJSONObject("pra").getString("language") + ".json\" NOT FOUND.LOADING EN_US.json");
             langpath = this.getDataFolder() + "/lang/en_us.json";
         }
-        variable.langjson = JSONObject.parseObject(FileUtils.readFile(langpath));
+        variable.langjson = new Config(langpath, Config.JSON);
+
         variable.disabledmg = variable.configjson.getJSONObject("pra").getJSONArray("disabledmg");
         try {
-            FileUtils.Copydir("./worlds/" + variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l") + "/", this.getDataFolder() + "/cache/");
+            FileUtils.Copydir("./worlds/" + this.getPluginConfig().getLevelName() + "/", this.getDataFolder() + "/cache/");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        LevelUtils.loadLevel(variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l"));
+        LevelUtils.loadLevel(this.getPluginConfig().getLevelName());
         getServer().getPluginManager().registerEvents(new EventLauncher(this), this);
         plugin.getServer().getCommandMap().register(variable.configjson.getJSONObject("pra").getString("command"), new RunCommand(variable.configjson.getJSONObject("pra").getString("command"), "Bridging Practise"));
         variable.lowy = variable.configjson.getJSONObject("pos").getDouble("lowy");
-        PluginTick.StartTick();
-        try {
-            new MetricsLite(this, 8604);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        this.getServer().getScheduler().scheduleTask(this, new PluginTick(this), true);
+
         JSONObject placeBlock = variable.configjson.getJSONObject("block");
         variable.cantPlaceOn.add(placeBlock.getInteger("stop"));
         variable.cantPlaceOn.add(placeBlock.getInteger("res"));
@@ -81,18 +84,29 @@ public class Main extends PluginBase {
         variable.cantPlaceOn.add(placeBlock.getInteger("backres"));
         variable.cantPlaceOn.add(placeBlock.getInteger("elevator"));
         Server.getInstance().getLogger().info("§eBridgingPractiseNK §fBy §bRicoGG §aSuccessfully Loaded.");
+
+        try {
+            new MetricsLite(this, 8604);
+        } catch (Exception ignored) {
+
+        }
     }
 
     @Override
     public void onDisable() {
-        LevelUtils.unloadLevel(variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l"));
+        String levelName = this.getPluginConfig().getLevelName();
+        LevelUtils.unloadLevel(levelName);
         try {
-            FileUtils.deldir("./worlds/" + variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l") + "/");
-            FileUtils.Copydir(this.getDataFolder() + "/cache/", "./worlds/" + variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l") + "/");
+            FileUtils.deldir("./worlds/" + levelName + "/");
+            FileUtils.Copydir(this.getDataFolder() + "/cache/", "./worlds/" + levelName + "/");
             FileUtils.deldir(this.getDataFolder() + "/cache/");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public PluginConfig getPluginConfig() {
+        return this.pluginConfig;
     }
 }
 

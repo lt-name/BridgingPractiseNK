@@ -1,6 +1,7 @@
 package cn.ricoco.bridgingpractise;
 
 import cn.nukkit.level.Position;
+import cn.nukkit.utils.Config;
 import cn.ricoco.bridgingpractise.Plugin.Exp;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -11,12 +12,11 @@ import java.util.Map;
 
 public class variable {
     public static JSONObject configjson;
-    public static JSONObject langjson;
+    public static Config langjson;
     public static JSONArray disabledmg;
     public static Double lowy;
     public static ArrayList<Integer> cantPlaceOn = new ArrayList<>();
-    public static Map<String, Map> blockpos = new HashMap<>();
-    public static Map<String, Integer> blocklength = new HashMap<>();
+    public static Map<String, Map<Integer, Position>> blockpos = new HashMap<>();
     public static Map<String, Integer> blocksecond = new HashMap<>();
     public static Map<String, Integer> blockmax = new HashMap<>();
     public static Map<String, Position> playerresp = new HashMap<>();

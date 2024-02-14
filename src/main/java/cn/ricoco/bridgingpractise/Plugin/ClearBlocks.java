@@ -1,51 +1,38 @@
 package cn.ricoco.bridgingpractise.Plugin;
 
+import cn.nukkit.Server;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.Vector3;
+import cn.ricoco.bridgingpractise.Main;
 import cn.ricoco.bridgingpractise.variable;
 
 import java.util.Map;
 
 public class ClearBlocks {
-    public Clear runner;
-    public Thread thread;
 
-    public ClearBlocks(Map blockmap, int blength, Boolean instabreak) {
+    public static void clearBlocks(Map<Integer, Position> blockmap, Boolean instabreak) {
+        if (blockmap == null || blockmap.isEmpty()) {
+            return;
+        }
+
         if (instabreak) {
-            for (int i = 0; i < blength; i++) {
+            clearBlocks(blockmap);
+        } else {
+            Server.getInstance().getScheduler().scheduleTask(Main.getPlugin(), () -> {
                 try {
-                    Position pos = (Position) blockmap.get(i);
-                    if (variable.configjson.getJSONObject("pra").getBoolean("breakparticle")) {
-                        pos.getLevel().addParticle(new DestroyBlockParticle(new Vector3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5), pos.getLevelBlock()));
-                    }
-                    pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, 0, 0);
-                } catch (Exception e) {
+                    Thread.sleep(variable.configjson.getJSONObject("pra").getInteger("breakdelay"));
+                    clearBlocks(blockmap);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-        } else {
-            runner = new Clear();
-            Clear.blockmap = blockmap;
-            Clear.blength = blength;
-            Clear.delay = variable.configjson.getJSONObject("pra").getInteger("breakdelay");
-            thread = new Thread(runner);
-            thread.start();
+            }, true);
         }
     }
-}
 
-class Clear implements Runnable {
-    public static int delay;
-    public static Map blockmap;
-    public static int blength;
-
-    @Override
-    public void run() {
-        for (int i = 0; i < blength; i++) {
+    private static void clearBlocks(Map<Integer, Position> blockmap) {
+        for (Position pos : blockmap.values()) {
             try {
-                Thread.sleep(delay);
-                Position pos = (Position) blockmap.get(i);
                 if (variable.configjson.getJSONObject("pra").getBoolean("breakparticle")) {
                     pos.getLevel().addParticle(new DestroyBlockParticle(new Vector3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5), pos.getLevelBlock()));
                 }

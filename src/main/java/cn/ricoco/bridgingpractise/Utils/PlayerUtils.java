@@ -18,17 +18,17 @@ public class PlayerUtils {
 
     public static void ClearBL(Player p, Boolean repb) {
         p.teleport(variable.playerresp.get(p.getName()));
-        int ble = variable.blocklength.remove(p.getName());
+        Map<Integer, Position> blockmap = variable.blockpos.get(p.getName());
+        int ble = blockmap.size();
         if (repb) {
-            LevelUtils.replaceBl(variable.blockpos.get(p.getName()), ble);
+            LevelUtils.replaceBl(blockmap);
         }
-        new ClearBlocks(variable.blockpos.remove(p.getName()), ble, variable.configjson.getJSONObject("pra").getBoolean("instabreak"));
+        ClearBlocks.clearBlocks(variable.blockpos.remove(p.getName()), variable.configjson.getJSONObject("pra").getBoolean("instabreak"));
         Map<Integer, Position> m = new HashMap<>();
         if (variable.blockmax.get(p.getName()) < ble) {
             variable.blockmax.put(p.getName(), ble);
         }
         variable.blockpos.put(p.getName(), m);
-        variable.blocklength.put(p.getName(), 0);
         variable.playeronresp.put(p.getName(), true);
     }
 }

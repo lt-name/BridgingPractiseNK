@@ -3,32 +3,27 @@ package cn.ricoco.bridgingpractise;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
-import cn.ricoco.bridgingpractise.Utils.ExpUtils;
-import cn.ricoco.bridgingpractise.Utils.FileUtils;
-import cn.ricoco.bridgingpractise.Utils.LevelUtils;
-import cn.ricoco.bridgingpractise.Utils.ScoreboardUtils;
+import cn.nukkit.scheduler.PluginTask;
+import cn.ricoco.bridgingpractise.Utils.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PluginTick {
-    public static Runner runner;
-    public static Thread thread;
+public class PluginTick extends PluginTask<Main> {
 
-    public static void StartTick() {
-        runner = new Runner();
-        thread = new Thread(runner);
-        thread.start();
+    private int tick = 0;
+
+    public PluginTick(Main owner) {
+        super(owner);
     }
-}
 
-class Runner implements Runnable {
-    public int tick = 0;
-
-    public void run() {
-        String promptstr = variable.langjson.getString("prompt"), lname = variable.configjson.getJSONObject("pos").getJSONObject("pra").getString("l"), weatherstr = variable.configjson.getJSONObject("pra").getString("weather");
+    @Override
+    public void onRun(int t) {
+        String promptstr = variable.langjson.getString("prompt");
+        String levelName = this.owner.getPluginConfig().getLevelName();
+        String weatherstr = variable.configjson.getJSONObject("pra").getString("weather");
         int ltime = variable.configjson.getJSONObject("pra").getInteger("time");
         Boolean prompt = variable.configjson.getJSONObject("pra").getBoolean("prompt");
         Boolean expSystem = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("enable");
@@ -74,13 +69,13 @@ class Runner implements Runnable {
                 }
                 SBCount++;
                 for (Player p : players) {
-                    if (p.getLevel().getName().equals(lname)) {
+                    if (p.getLevel().getName().equals(levelName)) {
                         if (tick >= 1) {
                             arenac++;
                             p.getFoodData().setLevel(20);
                             if (expSystem) {
                                 if (!variable.playerLevelJSON.containsKey(p.getName())) {
-                                    variable.playerLevelJSON.put(p.getName(), JSONObject.parseObject(FileUtils.readFile(Main.getPlugin().getDataFolder() + "/players/" + p.getName() + ".json")));
+                                    continue;
                                 }
                                 JSONObject plj = variable.playerLevelJSON.get(p.getName());
                                 if (timeEarn) {
@@ -105,7 +100,7 @@ class Runner implements Runnable {
                                 p.setExperience(0);
                             }
                             if (prompt) {
-                                p.sendPopup(promptstr.replaceAll("%1", variable.blocksecond.get(p.getName()) + "").replaceAll("%2", variable.blocklength.get(p.getName()) + "").replaceAll("%3", variable.blockmax.get(p.getName()) + ""));
+                                p.sendPopup(promptstr.replaceAll("%1", variable.blocksecond.get(p.getName()) + "").replaceAll("%2", variable.blockpos.get(p.getName()).size() + "").replaceAll("%3", variable.blockmax.get(p.getName()) + ""));
                             }
                             variable.blocksecond.put(p.getName(), 0);
                         }
@@ -122,10 +117,9 @@ class Runner implements Runnable {
                     }
                 }
                 if (arenac > 0 && tick >= 1) {
-                    tick = 0;
-                    Level l = Server.getInstance().getLevelByName(lname);
-                    l.setTime(ltime);
-                    LevelUtils.setLevelWeather(l, weatherstr);
+                    Level level = Server.getInstance().getLevelByName(levelName);
+                    level.setTime(ltime);
+                    LevelUtils.setLevelWeather(level, weatherstr);
                 }
             } catch (Exception e) {
                 Main.getPlugin().getLogger().error("Error in PluginTick: ", e);

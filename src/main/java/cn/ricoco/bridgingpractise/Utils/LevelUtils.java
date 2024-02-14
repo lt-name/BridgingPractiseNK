@@ -47,12 +47,11 @@ public class LevelUtils {
         }
     }
 
-    public static void replaceBl(Map blockmap, int blength) {
+    public static void replaceBl(Map<Integer, Position> blockmap) {
         JSONObject vR = variable.configjson.getJSONObject("pra").getJSONObject("victoryreplace");
         int repId = vR.getInteger("id"), repData = vR.getInteger("d");
-        for (int i = 0; i < blength; i++) {
+        for (Position pos : blockmap.values()) {
             try {
-                Position pos = (Position) blockmap.get(i);
                 pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, repId, repData);
             } catch (Exception e) {
                 e.printStackTrace();
