@@ -3,7 +3,6 @@ package cn.ricoco.bridgingpractise;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
@@ -170,39 +169,32 @@ public class EventLauncher implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onEntityDamageEvent(EntityDamageEvent e) {
-        if (e.isCancelled()) {
-            return;
-        }
-        if (e.getEntity() instanceof Player) {
-            Player p = (Player) e.getEntity();
-            Position pos = p.getPosition();
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityDamageEvent(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            Position pos = player.getPosition();
             if (pos.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-                String c = e.getCause().toString();
-                e.setCancelled();
-                if (c.equals("FALL")) {
+                if (event instanceof EntityDamageByEntityEvent && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+                    if (this.plugin.getPluginConfig().isPvpProtect()) {
+                        event.setCancelled();
+                    } else {
+                        event.setDamage(0);
+                    }
+                } else {
+                    event.setCancelled();
+                }
+                if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                     JSONObject json = variable.configjson.getJSONObject("pra");
-                    EntityUtils.displayHurt(p);
-                    if (json.getBoolean("iffalllagdmg") && json.getFloat("falllagdmg") <= e.getDamage()) {
-                        ClearBL(p, false);
+                    EntityUtils.displayHurt(player);
+                    if (json.getBoolean("iffalllagdmg") && json.getFloat("falllagdmg") <= event.getDamage()) {
+                        ClearBL(player, false);
                     }
                     if (json.getBoolean("falldmgtip")) {
-                        p.sendTitle(variable.langjson.getString("falldmgtip").replaceAll("%1", e.getDamage() + ""));
+                        player.sendTitle(variable.langjson.getString("falldmgtip").replaceAll("%1", event.getDamage() + ""));
                     }
                 }
             }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
-        if (e.isCancelled()) {
-            return;
-        }
-        Entity en = e.getEntity();
-        if (variable.configjson.getJSONObject("pra").getBoolean("pvpprotect") && en.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            e.setCancelled();
         }
     }
 
