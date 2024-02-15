@@ -17,14 +17,13 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.potion.Effect;
 import cn.ricoco.bridgingpractise.Plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.Plugin.Exp;
 import cn.ricoco.bridgingpractise.Utils.EntityUtils;
 import cn.ricoco.bridgingpractise.Utils.FileUtils;
+import cn.ricoco.bridgingpractise.Utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONObject;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,8 +72,9 @@ public class EventLauncher implements Listener {
             variable.playerTime.remove(playerName);
             Exp exp = variable.playerLevel.remove(playerName);
             p.setExperience(exp.getExp(), exp.getLv());
-            FileUtils.writeFile("./plugins/BridgingPractise/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
+            FileUtils.writeFile(this.plugin.getDataFolder() + "/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
             p.getFoodData().setLevel(variable.playerhunger.remove(playerName));
+            ScoreboardUtils.removeSB(p);
             p.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
         }
     }

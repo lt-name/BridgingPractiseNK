@@ -8,6 +8,6 @@ public class EntityUtils {
         EntityEventPacket pk = new EntityEventPacket();
         pk.eid = e.getId();
         pk.event = EntityEventPacket.HURT_ANIMATION;
-        e.getLevel().getPlayers().values().forEach((player -> player.dataPacket(pk)));
+        e.getViewers().values().forEach((player -> player.dataPacket(pk)));
     }
 }

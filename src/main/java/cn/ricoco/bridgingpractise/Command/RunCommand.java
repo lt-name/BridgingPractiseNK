@@ -4,6 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
+import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
@@ -12,6 +13,7 @@ import cn.ricoco.bridgingpractise.Plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.Plugin.Exp;
 import cn.ricoco.bridgingpractise.Utils.FileUtils;
 import cn.ricoco.bridgingpractise.Utils.PlayerUtils;
+import cn.ricoco.bridgingpractise.Utils.ScoreboardUtils;
 import cn.ricoco.bridgingpractise.variable;
 import com.alibaba.fastjson.JSONObject;
 
@@ -20,6 +22,14 @@ import java.util.HashMap;
 public class RunCommand extends Command {
     public RunCommand(String name, String description) {
         super(name, description);
+
+        this.commandParameters.clear();
+        this.commandParameters.put("join", new CommandParameter[] {
+                CommandParameter.newEnum("join", new String[]{"join"})
+        });
+        this.commandParameters.put("leave", new CommandParameter[] {
+                CommandParameter.newEnum("leave", new String[]{"leave"})
+        });
     }
 
     @Override
@@ -85,9 +95,10 @@ public class RunCommand extends Command {
                     variable.playerTime.remove(playerName);
                     Exp exp = variable.playerLevel.remove(playerName);
                     player.setExperience(exp.getExp(), exp.getLv());
-                    FileUtils.writeFile("./plugins/BridgingPractise/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
+                    FileUtils.writeFile(Main.getPlugin().getDataFolder() + "/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
                     player.getFoodData().setLevel(variable.playerhunger.remove(playerName));
                     player.setNameTag(player.getName());
+                    ScoreboardUtils.removeSB(player);
                     player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
                     sender.sendMessage(variable.langjson.getString("leavearena"));
                 } else {
