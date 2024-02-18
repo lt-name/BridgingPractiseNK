@@ -6,7 +6,7 @@
 
     <groupId>cn.ricoco.bridgingpractise</groupId>
     <artifactId>BridgingPractise</artifactId>
-    <version>1.2.2<!-- -SNAPSHOT--></version>
+    <version>1.2.3<!-- -SNAPSHOT--></version>
 
     <properties>
         <java.version>8</java.version>

@@ -55,9 +55,8 @@ public class RunCommand extends Command {
                     variable.blocksecond.put(playerName, 0);
                     variable.blockmax.put(playerName, 0);
                     player.getInventory().clearAll();
-                    JSONObject j = variable.configjson.getJSONObject("block").getJSONObject("pra");
-                    PlayerUtils.addItemToPlayer(player, Item.get(j.getInteger("id"), j.getInteger("d"), j.getInteger("c")));
-                    j = variable.configjson.getJSONObject("block").getJSONObject("pickaxe");
+                    PlayerUtils.addItemToPlayer(player, Main.getPlugin().getPluginConfig().getBlockInfo().toItem());
+                    JSONObject j = variable.configjson.getJSONObject("block").getJSONObject("pickaxe");
                     PlayerUtils.addItemToPlayer(player, Item.get(j.getInteger("id"), j.getInteger("d"), 1));
                     Position pos = Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(Main.getPlugin().getPluginConfig().getLevelName()));
                     variable.playerresp.put(playerName, pos);

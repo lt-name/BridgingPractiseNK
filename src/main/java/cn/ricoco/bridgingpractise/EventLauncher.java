@@ -20,6 +20,7 @@ import cn.ricoco.bridgingpractise.Plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.Plugin.Exp;
 import cn.ricoco.bridgingpractise.Utils.EntityUtils;
 import cn.ricoco.bridgingpractise.Utils.FileUtils;
+import cn.ricoco.bridgingpractise.Utils.PlayerUtils;
 import cn.ricoco.bridgingpractise.Utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONObject;
 
@@ -216,6 +217,17 @@ public class EventLauncher implements Listener {
                 JSONObject plj = variable.playerLevelJSON.get(p.getName());
                 plj.put("place", plj.getInteger("place") + 1);
                 variable.playerLevelJSON.put(p.getName(), plj);
+
+                Item item = e.getItem();
+                PluginConfig.BlockInfo blockInfo = Main.getPlugin().getPluginConfig().getBlockInfo();
+                if (item.getId() == blockInfo.getId()
+                        && item.getDamage() == blockInfo.getMeta()
+                        && item.getCount() <= 1) {
+                    Server.getInstance().getScheduler().scheduleDelayedTask(Main.getPlugin(),
+                            () -> PlayerUtils.addItemToPlayer(p, blockInfo.toItem()),
+                            1
+                    );
+                }
             } else {
                 p.sendMessage(variable.langjson.getString("cantplaceon"));
             }
