@@ -210,10 +210,13 @@ public class EventLauncher implements Listener {
             if (!variable.cantPlaceOn.contains(bid) && !variable.cantPlaceOn.contains(Position.fromObject(floor.add(0, -2, 0), b.level).getLevelBlock().getId())) {
                 //b.level.setBlockAt((int) b.x, (int) b.y, (int) b.z, b.getId(), b.getDamage());
                 e.setCancelled(false);
+                if (!variable.blockpos.containsKey(p.getName())) {
+                    variable.blockpos.put(p.getName(), new HashMap<>());
+                }
                 Map<Integer, Position> blockPosMap = variable.blockpos.get(p.getName());
                 blockPosMap.put(blockPosMap.size() + 1, floor);
-                variable.blocksecond.put(p.getName(), variable.blocksecond.get(p.getName()) + 1);
-                variable.playerBlock.put(p.getName(), variable.playerBlock.get(p.getName()) + 1);
+                variable.blocksecond.put(p.getName(), variable.blocksecond.getOrDefault(p.getName(), 0) + 1);
+                variable.playerBlock.put(p.getName(), variable.playerBlock.getOrDefault(p.getName(), 0) + 1);
                 JSONObject plj = variable.playerLevelJSON.get(p.getName());
                 plj.put("place", plj.getInteger("place") + 1);
                 variable.playerLevelJSON.put(p.getName(), plj);

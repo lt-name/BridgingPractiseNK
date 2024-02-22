@@ -25,7 +25,7 @@ public class PlayerUtils {
         }
         ClearBlocks.clearBlocks(variable.blockpos.remove(p.getName()), variable.configjson.getJSONObject("pra").getBoolean("instabreak"));
         Map<Integer, Position> m = new HashMap<>();
-        if (variable.blockmax.get(p.getName()) < ble) {
+        if (variable.blockmax.getOrDefault(p.getName(), 0) < ble) {
             variable.blockmax.put(p.getName(), ble);
         }
         variable.blockpos.put(p.getName(), m);
