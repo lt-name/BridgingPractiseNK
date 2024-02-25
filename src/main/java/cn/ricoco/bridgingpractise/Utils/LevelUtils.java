@@ -33,18 +33,20 @@ public class LevelUtils {
     }
 
     public static void setLevelWeather(Level level, String mode) {
-        if (!mode.equals("clear")) {
-            if (mode.equals("rain")) {
+        if (mode != null) {
+            if (mode.equalsIgnoreCase("rain")) {
                 level.setRaining(true);
                 level.setThundering(false);
-            } else if (mode.equals("thunder")) {
+                return;
+            } else if (mode.equalsIgnoreCase("thunder")) {
                 level.setThundering(true);
                 level.setRaining(false);
+                return;
             }
-        } else {
-            level.setRaining(false);
-            level.setThundering(false);
         }
+        // clear
+        level.setRaining(false);
+        level.setThundering(false);
     }
 
     public static void replaceBl(Map<Integer, Position> blockmap) {
