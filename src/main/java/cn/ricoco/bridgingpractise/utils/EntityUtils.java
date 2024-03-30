@@ -1,4 +1,4 @@
-package cn.ricoco.bridgingpractise.Utils;
+package cn.ricoco.bridgingpractise.utils;
 
 import cn.nukkit.Player;
 import cn.nukkit.network.protocol.EntityEventPacket;

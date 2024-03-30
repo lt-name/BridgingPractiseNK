@@ -1,7 +1,7 @@
-package cn.ricoco.bridgingpractise.Utils;
+package cn.ricoco.bridgingpractise.utils;
 
 import cn.nukkit.Player;
-import cn.ricoco.bridgingpractise.variable;
+import cn.ricoco.bridgingpractise.Main;
 import com.alibaba.fastjson.JSONObject;
 
 public class ExpUtils {
@@ -34,13 +34,13 @@ public class ExpUtils {
     public static JSONObject addExp(JSONObject json, int add, Boolean expTip, Boolean lvUp, String earn, Player p) {
         int need = calcNeedExp(json.getInteger("level") + 1);
         if (expTip) {
-            p.sendMessage(variable.langjson.getString(earn).replaceAll("%1", add + ""));
+            p.sendMessage(Main.languageConfig.getString(earn).replaceAll("%1", add + ""));
         }
         if (need < (json.getInteger("exp") + add)) {
             json.put("level", json.getInteger("level") + 1);
             json.put("exp", (json.getInteger("exp") + add) - need);
             if (lvUp) {
-                p.sendMessage(variable.langjson.getString("levelup").replaceAll("%1", json.getInteger("level") + ""));
+                p.sendMessage(Main.languageConfig.getString("levelup").replaceAll("%1", json.getInteger("level") + ""));
             }
         } else {
             json.put("exp", json.getInteger("exp") + add);

@@ -8,19 +8,26 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
+ * 插件配置
+ *
  * @author LT_Name
  */
 @Getter
 public class PluginConfig {
 
-    private String levelName;
+    private final String levelName;
 
-    private boolean pvpProtect;
+    private final boolean pvpProtect;
 
-    private BlockInfo blockInfo;
+    private final BlockInfo blockInfo;
+
+    private final double lowY;
+
+    private final ArrayList<Integer> cantPlaceOn;
 
     public PluginConfig(Config config) {
         this.levelName = config.getString("pos.pra.l");
@@ -30,6 +37,15 @@ public class PluginConfig {
         Map<Object, Object> block = config.get("block", new LinkedTreeMap<>());
         Map<Object, Object> pra = (Map<Object, Object>) block.getOrDefault("pra", new LinkedTreeMap<>());
         this.blockInfo = new BlockInfo(toInt(pra.get("id")), toInt(pra.get("d")), toInt(pra.get("c")));
+
+        this.lowY = config.getDouble("pos.lowy");
+
+        this.cantPlaceOn = new ArrayList<>();
+        this.cantPlaceOn.add(toInt(block.get("stop")));
+        this.cantPlaceOn.add(toInt(block.get("res")));
+        this.cantPlaceOn.add(toInt(block.get("speedup")));
+        this.cantPlaceOn.add(toInt(block.get("backres")));
+        this.cantPlaceOn.add(toInt(block.get("elevator")));
     }
 
     @Data

@@ -1,4 +1,4 @@
-package cn.ricoco.bridgingpractise.Plugin;
+package cn.ricoco.bridgingpractise.plugin;
 
 import cn.nukkit.Server;
 import cn.nukkit.plugin.Plugin;

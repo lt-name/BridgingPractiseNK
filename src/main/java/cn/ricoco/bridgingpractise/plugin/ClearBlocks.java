@@ -1,4 +1,4 @@
-package cn.ricoco.bridgingpractise.Plugin;
+package cn.ricoco.bridgingpractise.plugin;
 
 import cn.nukkit.Server;
 import cn.nukkit.level.Position;
@@ -19,14 +19,12 @@ public class ClearBlocks {
         if (instabreak) {
             clearBlocks(blockmap);
         } else {
-            Server.getInstance().getScheduler().scheduleTask(Main.getPlugin(), () -> {
-                try {
-                    Thread.sleep(variable.configjson.getJSONObject("pra").getInteger("breakdelay"));
-                    clearBlocks(blockmap);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }, true);
+            Server.getInstance().getScheduler().scheduleDelayedTask(
+                    Main.getPlugin(),
+                    () -> clearBlocks(blockmap),
+                    variable.configjson.getJSONObject("pra").getInteger("breakdelay")/50,
+                    true
+            );
         }
     }
 
@@ -38,8 +36,9 @@ public class ClearBlocks {
                 }
                 pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, 0, 0);
             } catch (Exception e) {
-                e.printStackTrace();
+                Main.getPlugin().getLogger().error("Error while clearing block at " + pos.toString(), e);
             }
         }
+        blockmap.clear();
     }
 }

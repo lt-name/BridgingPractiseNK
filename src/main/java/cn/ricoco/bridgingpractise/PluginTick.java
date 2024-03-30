@@ -4,7 +4,10 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.scheduler.PluginTask;
-import cn.ricoco.bridgingpractise.Utils.*;
+import cn.ricoco.bridgingpractise.data.PlayerData;
+import cn.ricoco.bridgingpractise.utils.ExpUtils;
+import cn.ricoco.bridgingpractise.utils.LevelUtils;
+import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -21,7 +24,7 @@ public class PluginTick extends PluginTask<Main> {
 
     @Override
     public void onRun(int t) {
-        String promptstr = variable.langjson.getString("prompt");
+        String promptstr = Main.languageConfig.getString("prompt");
         String levelName = this.owner.getPluginConfig().getLevelName();
         String weatherstr = variable.configjson.getJSONObject("pra").getString("weather");
         int ltime = variable.configjson.getJSONObject("pra").getInteger("time");
@@ -31,8 +34,8 @@ public class PluginTick extends PluginTask<Main> {
         Boolean expTip = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("getexp");
         Boolean scoreb = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("scoreboard");
         int SBCount = 0;
-        String sbTitle = variable.langjson.getString("sbtitle");
-        String[] sbTitleL = variable.langjson.getString("sbtitle").split("");
+        String sbTitle = Main.languageConfig.getString("sbtitle");
+        String[] sbTitleL = Main.languageConfig.getString("sbtitle").split("");
         JSONArray SBThing = variable.configjson.getJSONObject("pra").getJSONArray("scoreboard");
         Boolean timeEarn = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getBoolean("enable");
         int timeEarnC = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getInteger("sec");
@@ -71,6 +74,7 @@ public class PluginTick extends PluginTask<Main> {
                 for (Player p : players) {
                     if (p.getLevel().getName().equals(levelName)) {
                         if (tick >= 1) {
+                            PlayerData playerData = this.owner.getPlayerData(p);
                             arenac++;
                             p.getFoodData().setLevel(20);
                             if (expSystem) {
@@ -79,17 +83,17 @@ public class PluginTick extends PluginTask<Main> {
                                 }
                                 JSONObject plj = variable.playerLevelJSON.get(p.getName());
                                 if (timeEarn) {
-                                    variable.playerTime.put(p.getName(), variable.playerTime.getOrDefault(p.getName(), 0) + 1);
-                                    if (variable.playerTime.get(p.getName()) >= timeEarnC) {
-                                        variable.playerTime.put(p.getName(), 0);
+                                    playerData.addPlayerTime();
+                                    if (playerData.getPlayerTime() >= timeEarnC) {
+                                        playerData.setPlayerTime(0);
                                         ExpUtils.addExp(plj, timeEarnE, expTip, lvUp, "timeearn", p);
                                         variable.playerLevelJSON.put(p.getName(), plj);
                                     }
                                 }
                                 if (blockEarn) {
-                                    int pBC = variable.playerBlock.getOrDefault(p.getName(), 0);
+                                    int pBC = playerData.getPlayerBlock();
                                     if (pBC >= blockEarnC) {
-                                        variable.playerBlock.put(p.getName(), pBC % blockEarnC);
+                                        playerData.setPlayerBlock(pBC % blockEarnC);
                                         int addExp = pBC / blockEarnC;
                                         ExpUtils.addExp(plj, blockEarnE * addExp, expTip, lvUp, "blockearn", p);
                                         variable.playerLevelJSON.put(p.getName(), plj);
@@ -100,9 +104,9 @@ public class PluginTick extends PluginTask<Main> {
                                 p.setExperience(0);
                             }
                             if (prompt) {
-                                p.sendPopup(promptstr.replaceAll("%1", variable.blocksecond.get(p.getName()) + "").replaceAll("%2", variable.blockpos.get(p.getName()).size() + "").replaceAll("%3", variable.blockmax.get(p.getName()) + ""));
+                                p.sendPopup(promptstr.replaceAll("%1", String.valueOf(playerData.getBlockSecond())).replaceAll("%2", playerData.getBlockPos().size() + "").replaceAll("%3", String.valueOf(playerData.getBlockMax())));
                             }
-                            variable.blocksecond.put(p.getName(), 0);
+                            playerData.setBlockSecond(0);
                         }
                         if (scoreb) {
                             ArrayList<String> arr = new ArrayList<>();

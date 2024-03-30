@@ -16,18 +16,18 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
-import cn.ricoco.bridgingpractise.Plugin.ClearBlocks;
-import cn.ricoco.bridgingpractise.Plugin.Exp;
-import cn.ricoco.bridgingpractise.Utils.EntityUtils;
-import cn.ricoco.bridgingpractise.Utils.FileUtils;
-import cn.ricoco.bridgingpractise.Utils.PlayerUtils;
-import cn.ricoco.bridgingpractise.Utils.ScoreboardUtils;
+import cn.ricoco.bridgingpractise.data.PlayerData;
+import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
+import cn.ricoco.bridgingpractise.plugin.Exp;
+import cn.ricoco.bridgingpractise.utils.EntityUtils;
+import cn.ricoco.bridgingpractise.utils.FileUtils;
+import cn.ricoco.bridgingpractise.utils.PlayerUtils;
+import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONObject;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import static cn.ricoco.bridgingpractise.Utils.PlayerUtils.ClearBL;
+import static cn.ricoco.bridgingpractise.utils.PlayerUtils.ClearBL;
 
 public class EventLauncher implements Listener {
     private final Main plugin;
@@ -42,7 +42,6 @@ public class EventLauncher implements Listener {
         String playerJson = "/players/" + player.getName() + ".json";
         this.plugin.saveResource("resources/player.json", playerJson, false);
         variable.playerLevelJSON.put(player.getName(), JSONObject.parseObject(FileUtils.readFile(Main.getPlugin().getDataFolder() + playerJson)));
-        variable.blockpos.put(player.getName(), new HashMap<>());
         if (player.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
             Position pos = Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l")));
             Server.getInstance().getScheduler().scheduleDelayedTask(this.plugin, () -> {
@@ -55,27 +54,26 @@ public class EventLauncher implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        Player p = e.getPlayer();
-        if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            String playerName = p.getName();
+        Player player = e.getPlayer();
+        if (player.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
+            String playerName = player.getName();
+            PlayerData playerData = this.plugin.getPlayerData(player);
+            
+            ClearBlocks.clearBlocks(playerData.getBlockPos(), true);
 
-            ClearBlocks.clearBlocks(variable.blockpos.remove(playerName), true);
-
-            p.setGamemode(variable.playergamemode.get(playerName));
-            p.getInventory().setContents(variable.playerinv.remove(playerName));
-            variable.playerresp.remove(playerName);
-            variable.blocksecond.remove(playerName);
-            variable.blockmax.remove(playerName);
-            variable.playeronresp.remove(playerName);
-            variable.playeronelevator.remove(playerName);
-            variable.playerBlock.remove(playerName);
-            variable.playerTime.remove(playerName);
-            Exp exp = variable.playerLevel.remove(playerName);
-            p.setExperience(exp.getExp(), exp.getLv());
+            player.setGamemode(playerData.getPlayerGameMode());
+            player.getInventory().setContents(playerData.getPlayerInv());
+            Exp exp = playerData.getPlayerLevel();
+            player.setExperience(exp.getExp(), exp.getLv());
             FileUtils.writeFile(this.plugin.getDataFolder() + "/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
-            p.getFoodData().setLevel(variable.playerhunger.remove(playerName));
-            ScoreboardUtils.removeSB(p);
-            p.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
+            player.getFoodData().setLevel(playerData.getPlayerHunger());
+            ScoreboardUtils.removeSB(player);
+            player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
+        }
+
+        PlayerData remove = this.plugin.getPlayerDataMap().remove(player);
+        if (remove != null) {
+            remove.save();
         }
     }
 
@@ -86,7 +84,7 @@ public class EventLauncher implements Listener {
             String cmd = e.getMessage().substring(1).split(" ")[0];
             if (!variable.configjson.getJSONObject("pra").getJSONArray("enablecmd").contains(cmd)) {
                 e.setCancelled();
-                p.sendMessage(variable.langjson.getString("cmddisable"));
+                p.sendMessage(Main.languageConfig.getString("cmddisable"));
             }
         }
     }
@@ -99,7 +97,7 @@ public class EventLauncher implements Listener {
         Player p = e.getPlayer();
         if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName()) && !variable.configjson.getJSONObject("pra").getBoolean("candrop")) {
             e.setCancelled();
-            p.sendMessage(variable.langjson.getString("cantdrop"));
+            p.sendMessage(Main.languageConfig.getString("cantdrop"));
         }
     }
 
@@ -110,32 +108,35 @@ public class EventLauncher implements Listener {
         }
         Player p = e.getPlayer();
         Position pos = p.getPosition();
-        if (pos.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            if (pos.getY() < variable.lowy) {
+        PluginConfig pluginConfig = this.plugin.getPluginConfig();
+        if (pos.getLevel().getName().equals(pluginConfig.getLevelName())) {
+            if (pos.getY() < pluginConfig.getLowY()) {
                 ClearBL(p, false);
                 return;
             }
+            PlayerData playerData = this.plugin.getPlayerData(p);
             int bid = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock().getId();
             if (bid == variable.configjson.getJSONObject("block").getInteger("res")) {
-                if (!variable.playeronresp.containsKey(p.getName()) || !variable.playeronresp.get(p.getName())) {
-                    p.sendTitle(variable.langjson.getString("setresp"));
-                    variable.playeronresp.put(p.getName(), true);
+                if (!playerData.isPlayeronresp()) {
+                    p.sendTitle(Main.languageConfig.getString("setresp"));
+                    playerData.setPlayeronresp(true);
                     Block bl = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock();
-                    variable.playerresp.put(p.getName(), Position.fromObject(new Vector3(bl.x + 0.5, bl.y + 1, bl.z + 0.5), pos.level));
+
+                    playerData.setPlayerResPos(Position.fromObject(new Vector3(bl.x + 0.5, bl.y + 1, bl.z + 0.5), pos.level));
                     return;
                 }
             } else {
-                variable.playeronresp.put(p.getName(), false);
+                playerData.setPlayeronresp(false);
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("stop")) {
-                p.sendTitle(variable.langjson.getString("completebridge"));
+                p.sendTitle(Main.languageConfig.getString("completebridge"));
                 ClearBL(p, true);
                 return;
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("backres")) {
-                p.sendTitle(variable.langjson.getString("backresp"));
-                variable.playeronresp.put(p.getName(), true);
-                p.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(this.plugin.getPluginConfig().getLevelName())));
+                p.sendTitle(Main.languageConfig.getString("backresp"));
+                playerData.setPlayeronresp(true);
+                p.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(pluginConfig.getLevelName())));
                 return;
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("speedup")) {
@@ -144,8 +145,8 @@ public class EventLauncher implements Listener {
             }
             int eid = variable.configjson.getJSONObject("block").getInteger("elevator");
             if (bid == eid) {
-                if (!variable.playeronelevator.get(p.getName())) {
-                    variable.playeronelevator.put(p.getName(), true);
+                if (!playerData.isPlayeronelevator()) {
+                    playerData.setPlayeronelevator(true);
                     Position tppos = null;
                     double posx = pos.x, posy = pos.y - 1, posz = pos.z;
                     Level posl = pos.level;
@@ -159,13 +160,13 @@ public class EventLauncher implements Listener {
                         }
                     }
                     if (tppos == null) {
-                        p.sendMessage(variable.langjson.getString("tpfailed"));
+                        p.sendMessage(Main.languageConfig.getString("tpfailed"));
                     } else {
                         p.teleport(tppos);
                     }
                 }
             } else {
-                variable.playeronelevator.put(p.getName(), false);
+                playerData.setPlayeronelevator(false);
             }
         }
     }
@@ -192,7 +193,7 @@ public class EventLauncher implements Listener {
                         ClearBL(player, false);
                     }
                     if (json.getBoolean("falldmgtip")) {
-                        player.sendTitle(variable.langjson.getString("falldmgtip").replaceAll("%1", event.getDamage() + ""));
+                        player.sendTitle(Main.languageConfig.getString("falldmgtip").replaceAll("%1", event.getDamage() + ""));
                     }
                 }
             }
@@ -203,23 +204,22 @@ public class EventLauncher implements Listener {
     public void onBlockPlaceEvent(BlockPlaceEvent e) {
         Block b = e.getBlock();
         if (b.level.getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            Player p = e.getPlayer();
+            Player player = e.getPlayer();
+            PlayerData playerData = this.plugin.getPlayerData(player);
+
             e.setCancelled();
             int bid = b.getSide(BlockFace.DOWN).getId();
             Position floor = b.floor();
-            if (!variable.cantPlaceOn.contains(bid) && !variable.cantPlaceOn.contains(Position.fromObject(floor.add(0, -2, 0), b.level).getLevelBlock().getId())) {
+            if (!this.plugin.getPluginConfig().getCantPlaceOn().contains(bid) && !this.plugin.getPluginConfig().getCantPlaceOn().contains(Position.fromObject(floor.add(0, -2, 0), b.level).getLevelBlock().getId())) {
                 //b.level.setBlockAt((int) b.x, (int) b.y, (int) b.z, b.getId(), b.getDamage());
                 e.setCancelled(false);
-                if (!variable.blockpos.containsKey(p.getName())) {
-                    variable.blockpos.put(p.getName(), new HashMap<>());
-                }
-                Map<Integer, Position> blockPosMap = variable.blockpos.get(p.getName());
+                Map<Integer, Position> blockPosMap = playerData.getBlockPos();
                 blockPosMap.put(blockPosMap.size() + 1, floor);
-                variable.blocksecond.put(p.getName(), variable.blocksecond.getOrDefault(p.getName(), 0) + 1);
-                variable.playerBlock.put(p.getName(), variable.playerBlock.getOrDefault(p.getName(), 0) + 1);
-                JSONObject plj = variable.playerLevelJSON.get(p.getName());
+                playerData.addBlockSecond();
+                playerData.addPlayerBlock();
+                JSONObject plj = variable.playerLevelJSON.get(player.getName());
                 plj.put("place", plj.getInteger("place") + 1);
-                variable.playerLevelJSON.put(p.getName(), plj);
+                variable.playerLevelJSON.put(player.getName(), plj);
 
                 Item item = e.getItem();
                 PluginConfig.BlockInfo blockInfo = Main.getPlugin().getPluginConfig().getBlockInfo();
@@ -227,12 +227,12 @@ public class EventLauncher implements Listener {
                         && item.getDamage() == blockInfo.getMeta()
                         && item.getCount() <= 1) {
                     Server.getInstance().getScheduler().scheduleDelayedTask(Main.getPlugin(),
-                            () -> PlayerUtils.addItemToPlayer(p, blockInfo.toItem()),
+                            () -> PlayerUtils.addItemToPlayer(player, blockInfo.toItem()),
                             1
                     );
                 }
             } else {
-                p.sendMessage(variable.langjson.getString("cantplaceon"));
+                player.sendMessage(Main.languageConfig.getString("cantplaceon"));
             }
         }
     }

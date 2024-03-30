@@ -1,4 +1,4 @@
-package cn.ricoco.bridgingpractise.Utils;
+package cn.ricoco.bridgingpractise.utils;
 
 import cn.ricoco.bridgingpractise.Main;
 

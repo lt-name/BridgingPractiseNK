@@ -1,4 +1,4 @@
-package cn.ricoco.bridgingpractise.Utils;
+package cn.ricoco.bridgingpractise.utils;
 
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
@@ -10,7 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import java.io.File;
 import java.util.Map;
 
-import static cn.ricoco.bridgingpractise.Utils.FileUtils.ReadJar;
+import static cn.ricoco.bridgingpractise.utils.FileUtils.ReadJar;
 
 public class LevelUtils {
     public static void unzip(String dir) {

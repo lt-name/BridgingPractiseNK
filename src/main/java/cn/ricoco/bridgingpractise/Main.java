@@ -1,24 +1,34 @@
 package cn.ricoco.bridgingpractise;
 
+import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
-import cn.ricoco.bridgingpractise.Command.RunCommand;
-import cn.ricoco.bridgingpractise.Plugin.MetricsLite;
-import cn.ricoco.bridgingpractise.Utils.FileUtils;
-import cn.ricoco.bridgingpractise.Utils.LevelUtils;
+import cn.ricoco.bridgingpractise.command.RunCommand;
+import cn.ricoco.bridgingpractise.data.PlayerData;
+import cn.ricoco.bridgingpractise.plugin.MetricsLite;
+import cn.ricoco.bridgingpractise.utils.FileUtils;
+import cn.ricoco.bridgingpractise.utils.LevelUtils;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Main extends PluginBase {
 
     public static Main plugin;
 
     private PluginConfig pluginConfig;
+
+    @Getter
+    private final ConcurrentHashMap<Player, PlayerData> playerDataMap = new ConcurrentHashMap<>();
+
+    public static Config languageConfig;
 
     public static Main getPlugin() {
         return plugin;
@@ -62,34 +72,28 @@ public class Main extends PluginBase {
             plugin.getLogger().warning("LANGUAGE \"" + variable.configjson.getJSONObject("pra").getString("language") + ".json\" NOT FOUND.LOADING EN_US.json");
             langpath = this.getDataFolder() + "/lang/en_us.json";
         }
-        variable.langjson = new Config(langpath, Config.JSON);
+        languageConfig = new Config(langpath, Config.JSON);
 
-        variable.disabledmg = variable.configjson.getJSONObject("pra").getJSONArray("disabledmg");
         try {
             FileUtils.Copydir("./worlds/" + this.getPluginConfig().getLevelName() + "/", this.getDataFolder() + "/cache/");
         } catch (IOException e) {
             e.printStackTrace();
         }
         LevelUtils.loadLevel(this.getPluginConfig().getLevelName());
-        getServer().getPluginManager().registerEvents(new EventLauncher(this), this);
-        plugin.getServer().getCommandMap().register(variable.configjson.getJSONObject("pra").getString("command"), new RunCommand(variable.configjson.getJSONObject("pra").getString("command"), "Bridging Practise"));
-        variable.lowy = variable.configjson.getJSONObject("pos").getDouble("lowy");
+
+        this.getServer().getPluginManager().registerEvents(new EventLauncher(this), this);
+
+        this.getServer().getCommandMap().register(variable.configjson.getJSONObject("pra").getString("command"), new RunCommand(variable.configjson.getJSONObject("pra").getString("command"), "Bridging Practise"));
 
         this.getServer().getScheduler().scheduleTask(this, new PluginTick(this), true);
-
-        JSONObject placeBlock = variable.configjson.getJSONObject("block");
-        variable.cantPlaceOn.add(placeBlock.getInteger("stop"));
-        variable.cantPlaceOn.add(placeBlock.getInteger("res"));
-        variable.cantPlaceOn.add(placeBlock.getInteger("speedup"));
-        variable.cantPlaceOn.add(placeBlock.getInteger("backres"));
-        variable.cantPlaceOn.add(placeBlock.getInteger("elevator"));
-        Server.getInstance().getLogger().info("§eBridgingPractiseNK §fBy §bRicoGG §aSuccessfully Loaded.");
 
         try {
             new MetricsLite(this, 8604);
         } catch (Exception ignored) {
 
         }
+
+        this.getLogger().info("§eBridgingPractiseNK §fBy §bRicoGG §aSuccessfully Loaded.");
     }
 
     @Override
@@ -107,6 +111,14 @@ public class Main extends PluginBase {
 
     public PluginConfig getPluginConfig() {
         return this.pluginConfig;
+    }
+
+    @NotNull
+    public PlayerData getPlayerData(@NotNull Player player) {
+        if (!playerDataMap.containsKey(player)) {
+            playerDataMap.put(player, new PlayerData(player, new Config(this.getDataFolder() + "/players/" + player.getName() + ".json", Config.JSON)));
+        }
+        return playerDataMap.get(player);
     }
 }
 

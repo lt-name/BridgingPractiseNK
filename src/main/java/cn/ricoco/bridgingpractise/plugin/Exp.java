@@ -1,4 +1,4 @@
-package cn.ricoco.bridgingpractise.Plugin;
+package cn.ricoco.bridgingpractise.plugin;
 
 public class Exp {
     private int exp;
