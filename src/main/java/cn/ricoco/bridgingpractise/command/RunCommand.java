@@ -14,8 +14,8 @@ import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
 import cn.ricoco.bridgingpractise.utils.FileUtils;
-import cn.ricoco.bridgingpractise.utils.PlayerUtils;
 import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
+import cn.ricoco.bridgingpractise.utils.Utils;
 import cn.ricoco.bridgingpractise.variable;
 import com.alibaba.fastjson.JSONObject;
 
@@ -55,9 +55,9 @@ public class RunCommand extends Command {
                     playerData.setBlockSecond(0);
                     playerData.setBlockMax(0);
                     player.getInventory().clearAll();
-                    PlayerUtils.addItemToPlayer(player, Main.getPlugin().getPluginConfig().getBlockInfo().toItem());
+                    Utils.addItemToPlayer(player, Main.getPlugin().getPluginConfig().getBlockInfo().toItem());
                     JSONObject j = variable.configjson.getJSONObject("block").getJSONObject("pickaxe");
-                    PlayerUtils.addItemToPlayer(player, Item.get(j.getInteger("id"), j.getInteger("d"), 1));
+                    Utils.addItemToPlayer(player, Item.get(j.getInteger("id"), j.getInteger("d"), 1));
                     Position pos = Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(Main.getPlugin().getPluginConfig().getLevelName()));
                     playerData.setPlayerResPos(pos);
                     playerData.setPlayeronresp(false);

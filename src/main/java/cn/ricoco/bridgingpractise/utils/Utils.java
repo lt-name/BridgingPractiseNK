@@ -3,6 +3,7 @@ package cn.ricoco.bridgingpractise.utils;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
+import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.ricoco.bridgingpractise.Main;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
@@ -11,19 +12,27 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-public class PlayerUtils {
-    public static void addItemToPlayer(Player player, Item item) {
+/**
+ * @author LT_Name
+ */
+public class Utils {
+
+    private Utils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static void addItemToPlayer(@NotNull Player player, @NotNull Item item) {
         if (player.getInventory().canAddItem(item)) {
             player.getInventory().addItem(item);
         }
     }
 
-    public static void ClearBL(@NotNull Player player, Boolean repb) {
+    public static void ClearBL(@NotNull Player player, boolean replaceBlocks) {
         PlayerData playerData = Main.getPlugin().getPlayerData(player);
         player.teleport(playerData.getPlayerResPos());
         Map<Integer, Position> blockmap = playerData.getBlockPos();
         int ble = blockmap.size();
-        if (repb) {
+        if (replaceBlocks) {
             LevelUtils.replaceBl(blockmap);
         }
         ClearBlocks.clearBlocks(blockmap, variable.configjson.getJSONObject("pra").getBoolean("instabreak"));
@@ -32,4 +41,12 @@ public class PlayerUtils {
         }
         playerData.setPlayeronresp(true);
     }
+
+    public static void displayHurt(Player e) {
+        EntityEventPacket pk = new EntityEventPacket();
+        pk.eid = e.getId();
+        pk.event = EntityEventPacket.HURT_ANIMATION;
+        e.getViewers().values().forEach((player -> player.dataPacket(pk)));
+    }
+
 }

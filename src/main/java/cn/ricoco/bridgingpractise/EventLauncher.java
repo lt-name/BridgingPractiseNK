@@ -19,14 +19,11 @@ import cn.nukkit.math.Vector3;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
-import cn.ricoco.bridgingpractise.utils.EntityUtils;
-import cn.ricoco.bridgingpractise.utils.PlayerUtils;
 import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
+import cn.ricoco.bridgingpractise.utils.Utils;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
-
-import static cn.ricoco.bridgingpractise.utils.PlayerUtils.ClearBL;
 
 public class EventLauncher implements Listener {
     private final Main plugin;
@@ -108,7 +105,7 @@ public class EventLauncher implements Listener {
         PluginConfig pluginConfig = this.plugin.getPluginConfig();
         if (pos.getLevel().getName().equals(pluginConfig.getLevelName())) {
             if (pos.getY() < pluginConfig.getLowY()) {
-                ClearBL(p, false);
+                Utils.ClearBL(p, false);
                 return;
             }
             PlayerData playerData = this.plugin.getPlayerData(p);
@@ -127,7 +124,7 @@ public class EventLauncher implements Listener {
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("stop")) {
                 p.sendTitle(Main.languageConfig.getString("completebridge"));
-                ClearBL(p, true);
+                Utils.ClearBL(p, true);
                 return;
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("backres")) {
@@ -185,9 +182,9 @@ public class EventLauncher implements Listener {
                 }
                 if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
                     JSONObject json = variable.configjson.getJSONObject("pra");
-                    EntityUtils.displayHurt(player);
+                    Utils.displayHurt(player);
                     if (json.getBoolean("iffalllagdmg") && json.getFloat("falllagdmg") <= event.getDamage()) {
-                        ClearBL(player, false);
+                        Utils.ClearBL(player, false);
                     }
                     if (json.getBoolean("falldmgtip")) {
                         player.sendTitle(Main.languageConfig.getString("falldmgtip").replaceAll("%1", event.getDamage() + ""));
@@ -222,7 +219,7 @@ public class EventLauncher implements Listener {
                         && item.getDamage() == blockInfo.getMeta()
                         && item.getCount() <= 1) {
                     Server.getInstance().getScheduler().scheduleDelayedTask(Main.getPlugin(),
-                            () -> PlayerUtils.addItemToPlayer(player, blockInfo.toItem()),
+                            () -> Utils.addItemToPlayer(player, blockInfo.toItem()),
                             1
                     );
                 }
