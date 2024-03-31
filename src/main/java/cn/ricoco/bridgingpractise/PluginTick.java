@@ -9,7 +9,6 @@ import cn.ricoco.bridgingpractise.utils.ExpUtils;
 import cn.ricoco.bridgingpractise.utils.LevelUtils;
 import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,21 +72,16 @@ public class PluginTick extends PluginTask<Main> {
                 SBCount++;
                 for (Player p : players) {
                     if (p.getLevel().getName().equals(levelName)) {
+                        PlayerData playerData = this.owner.getPlayerData(p);
                         if (tick >= 1) {
-                            PlayerData playerData = this.owner.getPlayerData(p);
                             arenac++;
                             p.getFoodData().setLevel(20);
                             if (expSystem) {
-                                if (!variable.playerLevelJSON.containsKey(p.getName())) {
-                                    continue;
-                                }
-                                JSONObject plj = variable.playerLevelJSON.get(p.getName());
                                 if (timeEarn) {
                                     playerData.addPlayerTime();
                                     if (playerData.getPlayerTime() >= timeEarnC) {
                                         playerData.setPlayerTime(0);
-                                        ExpUtils.addExp(plj, timeEarnE, expTip, lvUp, "timeearn", p);
-                                        variable.playerLevelJSON.put(p.getName(), plj);
+                                        ExpUtils.addExp(playerData, timeEarnE, expTip, lvUp, "timeearn", p);
                                     }
                                 }
                                 if (blockEarn) {
@@ -95,11 +89,10 @@ public class PluginTick extends PluginTask<Main> {
                                     if (pBC >= blockEarnC) {
                                         playerData.setPlayerBlock(pBC % blockEarnC);
                                         int addExp = pBC / blockEarnC;
-                                        ExpUtils.addExp(plj, blockEarnE * addExp, expTip, lvUp, "blockearn", p);
-                                        variable.playerLevelJSON.put(p.getName(), plj);
+                                        ExpUtils.addExp(playerData, blockEarnE * addExp, expTip, lvUp, "blockearn", p);
                                     }
                                 }
-                                p.setExperience(plj.getInteger("exp"), plj.getInteger("level"));
+                                p.setExperience(playerData.getExp(), playerData.getLevel());
                             } else {
                                 p.setExperience(0);
                             }
@@ -110,8 +103,7 @@ public class PluginTick extends PluginTask<Main> {
                         }
                         if (scoreb) {
                             ArrayList<String> arr = new ArrayList<>();
-                            JSONObject plj = variable.playerLevelJSON.get(p.getName());
-                            String SB_Player = p.getName(), SB_Level = plj.getInteger("level") + "", SB_LowProgcess = plj.getInteger("exp") + "", SB_MaxProgcess = ExpUtils.calcNeedExp(plj.getInteger("level") + 1) + "", SB_Placed = plj.getInteger("place") + "";
+                            String SB_Player = p.getName(), SB_Level = playerData.getLevel() + "", SB_LowProgcess = playerData.getExp() + "", SB_MaxProgcess = ExpUtils.calcNeedExp(playerData.getLevel() + 1) + "", SB_Placed = playerData.getPlace() + "";
                             p.setNameTag("§7[e" + SB_Level + "§7]§f" + p.getName());
                             for (int i = 0; i < SBThing.size(); i++) {
                                 arr.add(SBThing.getString(i).replaceAll("%player", SB_Player).replaceAll("%level%", SB_Level).replaceAll("%lowProgcess%", SB_LowProgcess).replaceAll("%maxProgcess%", SB_MaxProgcess).replaceAll("%placed%", SB_Placed));

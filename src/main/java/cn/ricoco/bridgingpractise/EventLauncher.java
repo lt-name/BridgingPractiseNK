@@ -20,7 +20,6 @@ import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
 import cn.ricoco.bridgingpractise.utils.EntityUtils;
-import cn.ricoco.bridgingpractise.utils.FileUtils;
 import cn.ricoco.bridgingpractise.utils.PlayerUtils;
 import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONObject;
@@ -39,9 +38,7 @@ public class EventLauncher implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        String playerJson = "/players/" + player.getName() + ".json";
-        this.plugin.saveResource("resources/player.json", playerJson, false);
-        variable.playerLevelJSON.put(player.getName(), JSONObject.parseObject(FileUtils.readFile(Main.getPlugin().getDataFolder() + playerJson)));
+        this.plugin.saveResource("resources/player.json", "/players/" + player.getName() + ".json", false);
         if (player.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
             Position pos = Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l")));
             Server.getInstance().getScheduler().scheduleDelayedTask(this.plugin, () -> {
@@ -65,7 +62,6 @@ public class EventLauncher implements Listener {
             player.getInventory().setContents(playerData.getPlayerInv());
             Exp exp = playerData.getPlayerLevel();
             player.setExperience(exp.getExp(), exp.getLv());
-            FileUtils.writeFile(this.plugin.getDataFolder() + "/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
             player.getFoodData().setLevel(playerData.getPlayerHunger());
             ScoreboardUtils.removeSB(player);
             player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
@@ -74,6 +70,7 @@ public class EventLauncher implements Listener {
         PlayerData remove = this.plugin.getPlayerDataMap().remove(player);
         if (remove != null) {
             remove.save();
+            remove.clear();
         }
     }
 
@@ -217,9 +214,7 @@ public class EventLauncher implements Listener {
                 blockPosMap.put(blockPosMap.size() + 1, floor);
                 playerData.addBlockSecond();
                 playerData.addPlayerBlock();
-                JSONObject plj = variable.playerLevelJSON.get(player.getName());
-                plj.put("place", plj.getInteger("place") + 1);
-                variable.playerLevelJSON.put(player.getName(), plj);
+                playerData.addPlace(1);
 
                 Item item = e.getItem();
                 PluginConfig.BlockInfo blockInfo = Main.getPlugin().getPluginConfig().getBlockInfo();

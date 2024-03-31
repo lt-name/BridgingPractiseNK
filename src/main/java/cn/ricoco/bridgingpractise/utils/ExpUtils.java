@@ -2,7 +2,7 @@ package cn.ricoco.bridgingpractise.utils;
 
 import cn.nukkit.Player;
 import cn.ricoco.bridgingpractise.Main;
-import com.alibaba.fastjson.JSONObject;
+import cn.ricoco.bridgingpractise.data.PlayerData;
 
 public class ExpUtils {
     public static int calcExp(int lv) {
@@ -31,20 +31,20 @@ public class ExpUtils {
         }
     }
 
-    public static JSONObject addExp(JSONObject json, int add, Boolean expTip, Boolean lvUp, String earn, Player p) {
-        int need = calcNeedExp(json.getInteger("level") + 1);
+    public static PlayerData addExp(PlayerData playerData, int add, Boolean expTip, Boolean lvUp, String earn, Player p) {
+        int need = calcNeedExp(playerData.getLevel() + 1);
         if (expTip) {
             p.sendMessage(Main.languageConfig.getString(earn).replaceAll("%1", add + ""));
         }
-        if (need < (json.getInteger("exp") + add)) {
-            json.put("level", json.getInteger("level") + 1);
-            json.put("exp", (json.getInteger("exp") + add) - need);
+        if (need < (playerData.getExp() + add)) {
+            playerData.setLevel(playerData.getLevel() + 1);
+            playerData.setExp((playerData.getExp() + add) - need);
             if (lvUp) {
-                p.sendMessage(Main.languageConfig.getString("levelup").replaceAll("%1", json.getInteger("level") + ""));
+                p.sendMessage(Main.languageConfig.getString("levelup").replaceAll("%1", playerData.getLevel() + ""));
             }
         } else {
-            json.put("exp", json.getInteger("exp") + add);
+            playerData.setExp(playerData.getExp() + add);
         }
-        return json;
+        return playerData;
     }
 }

@@ -66,7 +66,6 @@ public class RunCommand extends Command {
                     playerData.setPlayerBlock(0);
                     playerData.setPlayerTime(0);
                     JSONObject plj = JSONObject.parseObject(FileUtils.readFile("./plugins/BridgingPractise/players/" + playerName + ".json"));
-                    variable.playerLevelJSON.put(playerName, plj);
                     player.setNameTag("§7[§6" + plj.getInteger("level") + "§7]§f" + player.getName());
                     if (variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("enable")) {
                         player.setExperience(plj.getInteger("exp"), plj.getInteger("level"));
@@ -88,7 +87,6 @@ public class RunCommand extends Command {
                     player.getInventory().setContents(playerData.getPlayerInv());
                     Exp exp = playerData.getPlayerLevel();
                     player.setExperience(exp.getExp(), exp.getLv());
-                    FileUtils.writeFile(Main.getPlugin().getDataFolder() + "/players/" + playerName + ".json", JSONObject.toJSONString(variable.playerLevelJSON.remove(playerName)));
                     player.getFoodData().setLevel(playerData.getPlayerHunger());
                     player.setNameTag(player.getName());
                     ScoreboardUtils.removeSB(player);
@@ -98,6 +96,7 @@ public class RunCommand extends Command {
                     PlayerData remove = Main.getPlugin().getPlayerDataMap().remove(playerName);
                     if (remove != null) {
                         remove.save();
+                        remove.clear();
                     }
                 } else {
                     sender.sendMessage(Main.languageConfig.getString("notinarena"));

@@ -75,9 +75,9 @@ public class Main extends PluginBase {
         languageConfig = new Config(langpath, Config.JSON);
 
         try {
-            FileUtils.Copydir("./worlds/" + this.getPluginConfig().getLevelName() + "/", this.getDataFolder() + "/cache/");
+            FileUtils.Copydir(this.getServer().getDataPath() + "/worlds/" + this.getPluginConfig().getLevelName() + "/", this.getDataFolder() + "/cache/");
         } catch (IOException e) {
-            e.printStackTrace();
+            this.getLogger().error("Error while copying level", e);
         }
         LevelUtils.loadLevel(this.getPluginConfig().getLevelName());
 
@@ -101,11 +101,11 @@ public class Main extends PluginBase {
         String levelName = this.getPluginConfig().getLevelName();
         LevelUtils.unloadLevel(levelName);
         try {
-            FileUtils.deldir("./worlds/" + levelName + "/");
-            FileUtils.Copydir(this.getDataFolder() + "/cache/", "./worlds/" + levelName + "/");
+            FileUtils.deldir(this.getServer().getDataPath() + "/worlds/" + levelName + "/");
+            FileUtils.Copydir(this.getDataFolder() + "/cache/", this.getServer().getDataPath() + "/worlds/" + levelName + "/");
             FileUtils.deldir(this.getDataFolder() + "/cache/");
         } catch (IOException e) {
-            e.printStackTrace();
+            this.getLogger().error("Error while copying level", e);
         }
     }
 

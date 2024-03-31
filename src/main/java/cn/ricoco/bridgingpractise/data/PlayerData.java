@@ -5,7 +5,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.Config;
 import cn.ricoco.bridgingpractise.plugin.Exp;
-import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,14 +40,22 @@ public class PlayerData {
     private boolean playeronresp;
     private boolean playeronelevator;
     private int playerGameMode;
-    private JSONObject playerLevelJSON;
     private Exp playerLevel;
     private int playerBlock;
     private int playerTime;
 
+    private int level;
+    private int place;
+    private int exp;
+
+
     public PlayerData(@NotNull Player player, @NotNull Config config) {
         this.player = player;
         this.config = config;
+
+        this.level = config.getInt("level");
+        this.place = config.getInt("place");
+        this.exp = config.getInt("exp");
     }
 
     public void addBlockSecond() {
@@ -63,8 +70,33 @@ public class PlayerData {
         this.playerTime++;
     }
 
-    public void save() {
+    public void addPlace(int count) {
+        this.place += count;
+    }
 
+    public void save() {
+        this.config.set("level", this.level);
+        this.config.set("place", this.place);
+        this.config.set("exp", this.exp);
+        this.config.save();
+    }
+
+    public void clear() {
+        this.blockPos.clear();
+        this.blockSecond = 0;
+        if (this.playerInv != null) {
+            this.playerInv.clear();
+        }
+        this.playerHunger = 20;
+        this.playeronresp = false;
+        this.playeronelevator = false;
+        this.playerGameMode = 0;
+        this.playerBlock = 0;
+        this.playerTime = 0;
+
+        this.level = 0;
+        this.place = 0;
+        this.exp = 0;
     }
 
 }
