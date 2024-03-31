@@ -35,11 +35,11 @@ public class RunCommand extends Command {
     @Override
     public boolean execute(CommandSender sender, String s, String[] args) {
         if (!sender.isPlayer()) {
-            sender.sendMessage(Main.languageConfig.getString("notplayer"));
+            sender.sendMessage(Main.language.translateString("notplayer"));
             return false;
         }
         if (args.length != 1) {
-            sender.sendMessage(Main.languageConfig.getString("usage").replaceAll("%1", variable.configjson.getJSONObject("pra").getString("command")));
+            sender.sendMessage(Main.language.translateString("usage", variable.configjson.getJSONObject("pra").getString("command")));
             return false;
         }
         Player player = (Player) sender;
@@ -72,12 +72,12 @@ public class RunCommand extends Command {
                     } else {
                         player.setExperience(0);
                     }
-                    sender.sendMessage(Main.languageConfig.getString("joinedarena"));
+                    sender.sendMessage(Main.language.translateString("joinedarena"));
                     player.teleport(pos);
                     player.setGamemode(0);
                     Tips.closeTipsShow(pos.getLevel().getFolderName(), player);
                 } else {
-                    sender.sendMessage(Main.languageConfig.getString("stillinarena"));
+                    sender.sendMessage(Main.language.translateString("stillinarena"));
                 }
                 break;
             case "leave":
@@ -92,18 +92,18 @@ public class RunCommand extends Command {
                     ScoreboardUtils.removeSB(player);
                     Tips.removeTipsConfig(player.getLevel().getFolderName(), player);
                     player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
-                    sender.sendMessage(Main.languageConfig.getString("leavearena"));
+                    sender.sendMessage(Main.language.translateString("leavearena"));
                     PlayerData remove = Main.getPlugin().getPlayerDataMap().remove(playerName);
                     if (remove != null) {
                         remove.save();
                         remove.clear();
                     }
                 } else {
-                    sender.sendMessage(Main.languageConfig.getString("notinarena"));
+                    sender.sendMessage(Main.language.translateString("notinarena"));
                 }
                 break;
             default:
-                sender.sendMessage(Main.languageConfig.getString("usage").replaceAll("%1", variable.configjson.getJSONObject("pra").getString("command")));
+                sender.sendMessage(Main.language.translateString("usage", variable.configjson.getJSONObject("pra").getString("command")));
         }
         return false;
     }

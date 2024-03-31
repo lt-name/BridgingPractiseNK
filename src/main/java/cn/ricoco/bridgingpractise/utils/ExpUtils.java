@@ -34,13 +34,13 @@ public class ExpUtils {
     public static PlayerData addExp(PlayerData playerData, int add, Boolean expTip, Boolean lvUp, String earn, Player p) {
         int need = calcNeedExp(playerData.getLevel() + 1);
         if (expTip) {
-            p.sendMessage(Main.languageConfig.getString(earn).replaceAll("%1", add + ""));
+            p.sendMessage(Main.language.translateString(earn, add));
         }
         if (need < (playerData.getExp() + add)) {
             playerData.setLevel(playerData.getLevel() + 1);
             playerData.setExp((playerData.getExp() + add) - need);
             if (lvUp) {
-                p.sendMessage(Main.languageConfig.getString("levelup").replaceAll("%1", playerData.getLevel() + ""));
+                p.sendMessage(Main.language.translateString("levelup", playerData.getLevel()));
             }
         } else {
             playerData.setExp(playerData.getExp() + add);

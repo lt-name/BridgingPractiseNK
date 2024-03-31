@@ -1,5 +1,6 @@
 package cn.ricoco.bridgingpractise;
 
+import cn.lanink.gamecore.utils.Language;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
@@ -28,7 +29,7 @@ public class Main extends PluginBase {
     @Getter
     private final ConcurrentHashMap<Player, PlayerData> playerDataMap = new ConcurrentHashMap<>();
 
-    public static Config languageConfig;
+    public static Language language;
 
     public static Main getPlugin() {
         return plugin;
@@ -72,7 +73,7 @@ public class Main extends PluginBase {
             plugin.getLogger().warning("LANGUAGE \"" + variable.configjson.getJSONObject("pra").getString("language") + ".json\" NOT FOUND.LOADING EN_US.json");
             langpath = this.getDataFolder() + "/lang/en_us.json";
         }
-        languageConfig = new Config(langpath, Config.JSON);
+        language = new Language(new Config(langpath, Config.JSON));
 
         try {
             FileUtils.Copydir(this.getServer().getDataPath() + "/worlds/" + this.getPluginConfig().getLevelName() + "/", this.getDataFolder() + "/cache/");

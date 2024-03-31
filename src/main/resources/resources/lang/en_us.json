@@ -1,5 +1,5 @@
 {
-    "usage":"§dUSAGE§a/%1 <join/leave>",
+    "usage":"§dUSAGE§a/%1% <join/leave>",
     "notplayer":"§cYOU MUST BE A PLAYER TO USE THIS COMMAND.",
     "joinedarena":"§aJoined Arena.",
     "stillinarena":"§cJoin Arena Failed.You are in the arena.",
@@ -7,15 +7,15 @@
     "notinarena":"§cLeaved Arena Failed.You not in the arena.",
     "completebridge":"§6§lVICTORY",
     "setresp":"§aRespawn Setted",
-    "falldmgtip":"§cFALL DAMAGE %1 HP",
+    "falldmgtip":"§cFALL DAMAGE %1% HP",
     "cantdrop":"§cYou can't drop this item.",
     "cmddisable":"§cThis command is disable in bridging practise.",
-    "prompt":"§l%1 Blocks/s | Distance %2 | Farthest %3",
+    "prompt":"§l%1% Blocks/s | Distance %2% | Farthest %3%",
     "backresp":"§9Return to Respawn",
     "tpfailed":"§cTeleport Failed.",
     "sbtitle": "BridgingPractise",
-    "timeearn": "§b+%1 Experience (Time Played)",
-    "blockearn": "§b+%1 Experience (Blocks)",
-    "levelup": "§f--------------------\n     §aLevel UP!\n       §9Level §e%1\n\n§f--------------------",
+    "timeearn": "§b+%1% Experience (Time Played)",
+    "blockearn": "§b+%1% Experience (Blocks)",
+    "levelup": "§f--------------------\n     §aLevel UP!\n       §9Level §e%1%\n\n§f--------------------",
     "cantplaceon":"§cYou cam't place block over there!"
 }

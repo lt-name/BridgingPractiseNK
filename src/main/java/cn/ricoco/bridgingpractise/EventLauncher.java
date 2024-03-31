@@ -78,7 +78,7 @@ public class EventLauncher implements Listener {
             String cmd = e.getMessage().substring(1).split(" ")[0];
             if (!variable.configjson.getJSONObject("pra").getJSONArray("enablecmd").contains(cmd)) {
                 e.setCancelled();
-                p.sendMessage(Main.languageConfig.getString("cmddisable"));
+                p.sendMessage(Main.language.translateString("cmddisable"));
             }
         }
     }
@@ -91,7 +91,7 @@ public class EventLauncher implements Listener {
         Player p = e.getPlayer();
         if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName()) && !variable.configjson.getJSONObject("pra").getBoolean("candrop")) {
             e.setCancelled();
-            p.sendMessage(Main.languageConfig.getString("cantdrop"));
+            p.sendMessage(Main.language.translateString("cantdrop"));
         }
     }
 
@@ -112,7 +112,7 @@ public class EventLauncher implements Listener {
             int bid = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock().getId();
             if (bid == variable.configjson.getJSONObject("block").getInteger("res")) {
                 if (!playerData.isPlayeronresp()) {
-                    p.sendTitle(Main.languageConfig.getString("setresp"));
+                    p.sendTitle(Main.language.translateString("setresp"));
                     playerData.setPlayeronresp(true);
                     Block bl = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock();
 
@@ -123,12 +123,12 @@ public class EventLauncher implements Listener {
                 playerData.setPlayeronresp(false);
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("stop")) {
-                p.sendTitle(Main.languageConfig.getString("completebridge"));
+                p.sendTitle(Main.language.translateString("completebridge"));
                 Utils.ClearBL(p, true);
                 return;
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("backres")) {
-                p.sendTitle(Main.languageConfig.getString("backresp"));
+                p.sendTitle(Main.language.translateString("backresp"));
                 playerData.setPlayeronresp(true);
                 p.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(pluginConfig.getLevelName())));
                 return;
@@ -154,7 +154,7 @@ public class EventLauncher implements Listener {
                         }
                     }
                     if (tppos == null) {
-                        p.sendMessage(Main.languageConfig.getString("tpfailed"));
+                        p.sendMessage(Main.language.translateString("tpfailed"));
                     } else {
                         p.teleport(tppos);
                     }
@@ -187,7 +187,7 @@ public class EventLauncher implements Listener {
                         Utils.ClearBL(player, false);
                     }
                     if (json.getBoolean("falldmgtip")) {
-                        player.sendTitle(Main.languageConfig.getString("falldmgtip").replaceAll("%1", event.getDamage() + ""));
+                        player.sendTitle(Main.language.translateString("falldmgtip", event.getDamage()));
                     }
                 }
             }
@@ -224,7 +224,7 @@ public class EventLauncher implements Listener {
                     );
                 }
             } else {
-                player.sendMessage(Main.languageConfig.getString("cantplaceon"));
+                player.sendMessage(Main.language.translateString("cantplaceon"));
             }
         }
     }

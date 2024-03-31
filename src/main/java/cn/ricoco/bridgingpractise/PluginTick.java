@@ -23,7 +23,7 @@ public class PluginTick extends PluginTask<Main> {
 
     @Override
     public void onRun(int t) {
-        String promptstr = Main.languageConfig.getString("prompt");
+        String promptstr = Main.language.translateString("prompt");
         String levelName = this.owner.getPluginConfig().getLevelName();
         String weatherstr = variable.configjson.getJSONObject("pra").getString("weather");
         int ltime = variable.configjson.getJSONObject("pra").getInteger("time");
@@ -33,8 +33,8 @@ public class PluginTick extends PluginTask<Main> {
         Boolean expTip = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("getexp");
         Boolean scoreb = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("scoreboard");
         int SBCount = 0;
-        String sbTitle = Main.languageConfig.getString("sbtitle");
-        String[] sbTitleL = Main.languageConfig.getString("sbtitle").split("");
+        String sbTitle = Main.language.translateString("sbtitle");
+        String[] sbTitleL = Main.language.translateString("sbtitle").split("");
         JSONArray SBThing = variable.configjson.getJSONObject("pra").getJSONArray("scoreboard");
         Boolean timeEarn = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getBoolean("enable");
         int timeEarnC = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getInteger("sec");
