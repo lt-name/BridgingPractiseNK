@@ -1,5 +1,6 @@
 package cn.ricoco.bridgingpractise;
 
+import cn.lanink.gamecore.scoreboard.ScoreboardUtil;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.level.Level;
@@ -7,7 +8,6 @@ import cn.nukkit.scheduler.PluginTask;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.utils.ExpUtils;
 import cn.ricoco.bridgingpractise.utils.LevelUtils;
-import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import com.alibaba.fastjson.JSONArray;
 
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class PluginTick extends PluginTask<Main> {
                             for (int i = 0; i < SBThing.size(); i++) {
                                 arr.add(SBThing.getString(i).replaceAll("%player", SB_Player).replaceAll("%level%", SB_Level).replaceAll("%lowProgcess%", SB_LowProgcess).replaceAll("%maxProgcess%", SB_MaxProgcess).replaceAll("%placed%", SB_Placed));
                             }
-                            ScoreboardUtils.showSBFromArrayList(p, arr, SB_Title);
+                            ScoreboardUtil.getScoreboard().showScoreboard(p, SB_Title, arr);
                         }
                     }
                 }

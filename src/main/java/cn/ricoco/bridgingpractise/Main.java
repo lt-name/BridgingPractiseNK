@@ -46,7 +46,7 @@ public class Main extends PluginBase {
         try {
             FileUtils.deldir(this.getDataFolder() + "/cache/");
         } catch (IOException e) {
-            e.printStackTrace();
+            this.getLogger().error("Error while deleting cache", e);
         }
         new File(this.getDataFolder() + "/lang/").mkdir();
         new File(this.getDataFolder() + "/players/").mkdir();
@@ -68,13 +68,15 @@ public class Main extends PluginBase {
         variable.configjson = JSONObject.parseObject(FileUtils.readFile(this.getDataFolder() + "/config.json"));
         this.pluginConfig = new PluginConfig(new Config(this.getDataFolder() + "/config.json", Config.JSON));
 
-        String langpath = this.getDataFolder() + "/lang/" + variable.configjson.getJSONObject("pra").getString("language") + ".json";
-        if (!new File(langpath).exists()) {
-            plugin.getLogger().warning("LANGUAGE \"" + variable.configjson.getJSONObject("pra").getString("language") + ".json\" NOT FOUND.LOADING EN_US.json");
-            langpath = this.getDataFolder() + "/lang/en_us.json";
+        //加载语言文件
+        File langFile = new File(this.getDataFolder() + "/lang/" + this.pluginConfig.getLanguage() + ".json");
+        if (!langFile.exists()) {
+            plugin.getLogger().warning("LANGUAGE \"" + this.pluginConfig.getLanguage() + ".json\" NOT FOUND.LOADING EN_US.json");
+            langFile = new File(this.getDataFolder() + "/lang/en_us.json");
         }
-        language = new Language(new Config(langpath, Config.JSON));
+        language = new Language(new Config(langFile, Config.JSON));
 
+        //准备地图
         try {
             FileUtils.Copydir(this.getServer().getDataPath() + "/worlds/" + this.getPluginConfig().getLevelName() + "/", this.getDataFolder() + "/cache/");
         } catch (IOException e) {
@@ -84,7 +86,7 @@ public class Main extends PluginBase {
 
         this.getServer().getPluginManager().registerEvents(new EventLauncher(this), this);
 
-        this.getServer().getCommandMap().register(variable.configjson.getJSONObject("pra").getString("command"), new RunCommand(variable.configjson.getJSONObject("pra").getString("command"), "Bridging Practise"));
+        this.getServer().getCommandMap().register(this.pluginConfig.getCommand(), new RunCommand(this.pluginConfig.getCommand(), "Bridging Practise"));
 
         this.getServer().getScheduler().scheduleTask(this, new PluginTick(this), true);
 

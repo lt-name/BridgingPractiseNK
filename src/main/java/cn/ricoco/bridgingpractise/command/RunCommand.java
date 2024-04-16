@@ -1,5 +1,6 @@
 package cn.ricoco.bridgingpractise.command;
 
+import cn.lanink.gamecore.scoreboard.ScoreboardUtil;
 import cn.lanink.gamecore.utils.Tips;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
@@ -14,7 +15,6 @@ import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
 import cn.ricoco.bridgingpractise.utils.FileUtils;
-import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import cn.ricoco.bridgingpractise.utils.Utils;
 import cn.ricoco.bridgingpractise.variable;
 import com.alibaba.fastjson.JSONObject;
@@ -39,7 +39,7 @@ public class RunCommand extends Command {
             return false;
         }
         if (args.length != 1) {
-            sender.sendMessage(Main.language.translateString("usage", variable.configjson.getJSONObject("pra").getString("command")));
+            sender.sendMessage(Main.language.translateString("usage", Main.getPlugin().getPluginConfig().getCommand()));
             return false;
         }
         Player player = (Player) sender;
@@ -86,14 +86,14 @@ public class RunCommand extends Command {
                     player.setGamemode(playerData.getPlayerGameMode());
                     player.getInventory().setContents(playerData.getPlayerInv());
                     Exp exp = playerData.getPlayerLevel();
-                    player.setExperience(exp.getExp(), exp.getLv());
+                    player.setExperience(exp.getExp(), exp.getLevel());
                     player.getFoodData().setLevel(playerData.getPlayerHunger());
                     player.setNameTag(player.getName());
-                    ScoreboardUtils.removeSB(player);
+                    ScoreboardUtil.getScoreboard().closeScoreboard(player);
                     Tips.removeTipsConfig(player.getLevel().getFolderName(), player);
                     player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
                     sender.sendMessage(Main.language.translateString("leavearena"));
-                    PlayerData remove = Main.getPlugin().getPlayerDataMap().remove(playerName);
+                    PlayerData remove = Main.getPlugin().getPlayerDataMap().remove(player);
                     if (remove != null) {
                         remove.save();
                         remove.clear();
@@ -103,7 +103,7 @@ public class RunCommand extends Command {
                 }
                 break;
             default:
-                sender.sendMessage(Main.language.translateString("usage", variable.configjson.getJSONObject("pra").getString("command")));
+                sender.sendMessage(Main.language.translateString("usage", Main.getPlugin().getPluginConfig().getCommand()));
         }
         return false;
     }

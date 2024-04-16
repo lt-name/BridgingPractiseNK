@@ -1,5 +1,6 @@
 package cn.ricoco.bridgingpractise;
 
+import cn.lanink.gamecore.scoreboard.ScoreboardUtil;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
@@ -19,7 +20,6 @@ import cn.nukkit.math.Vector3;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
-import cn.ricoco.bridgingpractise.utils.ScoreboardUtils;
 import cn.ricoco.bridgingpractise.utils.Utils;
 import com.alibaba.fastjson.JSONObject;
 
@@ -58,9 +58,9 @@ public class EventLauncher implements Listener {
             player.setGamemode(playerData.getPlayerGameMode());
             player.getInventory().setContents(playerData.getPlayerInv());
             Exp exp = playerData.getPlayerLevel();
-            player.setExperience(exp.getExp(), exp.getLv());
+            player.setExperience(exp.getExp(), exp.getLevel());
             player.getFoodData().setLevel(playerData.getPlayerHunger());
-            ScoreboardUtils.removeSB(player);
+            ScoreboardUtil.getScoreboard().closeScoreboard(player);
             player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
         }
 
@@ -76,7 +76,7 @@ public class EventLauncher implements Listener {
         Player p = e.getPlayer();
         if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
             String cmd = e.getMessage().substring(1).split(" ")[0];
-            if (!variable.configjson.getJSONObject("pra").getJSONArray("enablecmd").contains(cmd)) {
+            if (!this.plugin.getPluginConfig().getEnableCommandList().contains(cmd)) {
                 e.setCancelled();
                 p.sendMessage(Main.language.translateString("cmddisable"));
             }
@@ -214,12 +214,12 @@ public class EventLauncher implements Listener {
                 playerData.addPlace(1);
 
                 Item item = e.getItem();
-                PluginConfig.BlockInfo blockInfo = Main.getPlugin().getPluginConfig().getBlockInfo();
-                if (item.getId() == blockInfo.getId()
-                        && item.getDamage() == blockInfo.getMeta()
+                PluginConfig.ItemInfo itemInfo = Main.getPlugin().getPluginConfig().getBlockInfo();
+                if (item.getId() == itemInfo.getId()
+                        && item.getDamage() == itemInfo.getMeta()
                         && item.getCount() <= 1) {
                     Server.getInstance().getScheduler().scheduleDelayedTask(Main.getPlugin(),
-                            () -> Utils.addItemToPlayer(player, blockInfo.toItem()),
+                            () -> Utils.addItemToPlayer(player, itemInfo.toItem()),
                             1
                     );
                 }

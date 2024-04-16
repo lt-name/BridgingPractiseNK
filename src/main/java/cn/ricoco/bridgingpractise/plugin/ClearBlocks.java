@@ -4,9 +4,11 @@ import cn.nukkit.Server;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.scheduler.Task;
 import cn.ricoco.bridgingpractise.Main;
-import cn.ricoco.bridgingpractise.variable;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ClearBlocks {
@@ -19,10 +21,21 @@ public class ClearBlocks {
         if (instabreak) {
             clearBlocks(blockmap);
         } else {
-            Server.getInstance().getScheduler().scheduleDelayedTask(
+            Iterator<Map.Entry<Integer, Position>> iterator = new HashMap<>(blockmap).entrySet().iterator();
+            blockmap.clear();
+            Server.getInstance().getScheduler().scheduleRepeatingTask(
                     Main.getPlugin(),
-                    () -> clearBlocks(blockmap),
-                    variable.configjson.getJSONObject("pra").getInteger("breakdelay")/50,
+                    new Task() {
+                        @Override
+                        public void onRun(int i) {
+                            if (!iterator.hasNext()) {
+                                this.cancel();
+                                return;
+                            }
+                            clearBlock(iterator.next().getValue());
+                        }
+                    },
+                    Main.getPlugin().getPluginConfig().getBreakDelay() / 50, //ms -> tick
                     true
             );
         }
@@ -30,15 +43,19 @@ public class ClearBlocks {
 
     private static void clearBlocks(Map<Integer, Position> blockmap) {
         for (Position pos : blockmap.values()) {
-            try {
-                if (variable.configjson.getJSONObject("pra").getBoolean("breakparticle")) {
-                    pos.getLevel().addParticle(new DestroyBlockParticle(new Vector3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5), pos.getLevelBlock()));
-                }
-                pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, 0, 0);
-            } catch (Exception e) {
-                Main.getPlugin().getLogger().error("Error while clearing block at " + pos.toString(), e);
-            }
+            clearBlock(pos);
         }
         blockmap.clear();
+    }
+
+    private static void clearBlock(Position pos) {
+        try {
+            if (Main.getPlugin().getPluginConfig().isBreakShowParticle()) {
+                pos.getLevel().addParticle(new DestroyBlockParticle(new Vector3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5), pos.getLevelBlock()));
+            }
+            pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, 0, 0);
+        } catch (Exception e) {
+            Main.getPlugin().getLogger().error("Error while clearing block at " + pos.toString(), e);
+        }
     }
 }

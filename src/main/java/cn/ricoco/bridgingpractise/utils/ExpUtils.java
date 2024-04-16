@@ -5,6 +5,7 @@ import cn.ricoco.bridgingpractise.Main;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 
 public class ExpUtils {
+
     public static int calcExp(int lv) {
         if (lv <= 16) {
             //[Level]2 + 6[Level]

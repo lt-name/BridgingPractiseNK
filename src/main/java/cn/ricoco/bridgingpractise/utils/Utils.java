@@ -7,9 +7,9 @@ import cn.nukkit.network.protocol.EntityEventPacket;
 import cn.ricoco.bridgingpractise.Main;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
-import cn.ricoco.bridgingpractise.variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -19,6 +19,10 @@ public class Utils {
 
     private Utils() {
         throw new IllegalStateException("Utility class");
+    }
+
+    public static int toInt(Object object) {
+        return new BigDecimal(object.toString()).intValue();
     }
 
     public static void addItemToPlayer(@NotNull Player player, @NotNull Item item) {
@@ -35,7 +39,7 @@ public class Utils {
         if (replaceBlocks) {
             LevelUtils.replaceBl(blockmap);
         }
-        ClearBlocks.clearBlocks(blockmap, variable.configjson.getJSONObject("pra").getBoolean("instabreak"));
+        ClearBlocks.clearBlocks(blockmap, Main.getPlugin().getPluginConfig().isInstaBreak());
         if (playerData.getBlockMax() < ble) {
             playerData.setBlockMax(ble);
         }
