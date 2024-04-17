@@ -37,10 +37,9 @@ public class EventLauncher implements Listener {
         Player player = e.getPlayer();
         this.plugin.saveResource("resources/player.json", "/players/" + player.getName() + ".json", false);
         if (player.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            Position pos = Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l")));
             Server.getInstance().getScheduler().scheduleDelayedTask(this.plugin, () -> {
                 if (player.isOnline()) {
-                    player.teleport(pos);
+                    player.teleport(this.plugin.getPluginConfig().getExitPos());
                 }
             }, 60);
         }
@@ -61,7 +60,7 @@ public class EventLauncher implements Listener {
             player.setExperience(exp.getExp(), exp.getLevel());
             player.getFoodData().setLevel(playerData.getPlayerHunger());
             ScoreboardUtil.getScoreboard().closeScoreboard(player);
-            player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
+            player.teleport(this.plugin.getPluginConfig().getExitPos());
         }
 
         PlayerData remove = this.plugin.getPlayerDataMap().remove(player);
@@ -233,7 +232,7 @@ public class EventLauncher implements Listener {
     public void onBlockBreakEvent(BlockBreakEvent e) {
         Block b = e.getBlock();
         if (b.level.getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            if (b.getId() == variable.configjson.getJSONObject("block").getJSONObject("pra").getInteger("id")) {
+            if (b.getId() == this.plugin.getPluginConfig().getBlockInfo().getId()) {
                 Item[] dr = {};
                 e.setDrops(dr);
             } else {

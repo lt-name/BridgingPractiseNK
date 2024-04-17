@@ -4,8 +4,7 @@ import cn.nukkit.Server;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.ricoco.bridgingpractise.Main;
-import cn.ricoco.bridgingpractise.variable;
-import com.alibaba.fastjson.JSONObject;
+import cn.ricoco.bridgingpractise.PluginConfig;
 
 import java.io.File;
 import java.util.Map;
@@ -51,13 +50,12 @@ public class LevelUtils {
     }
 
     public static void replaceBl(Map<Integer, Position> blockmap) {
-        JSONObject vR = variable.configjson.getJSONObject("pra").getJSONObject("victoryreplace");
-        int repId = vR.getInteger("id"), repData = vR.getInteger("d");
+        PluginConfig pluginConfig = Main.getPlugin().getPluginConfig();
         for (Position pos : blockmap.values()) {
             try {
-                pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, repId, repData);
+                pos.level.setBlockAt((int) pos.x, (int) pos.y, (int) pos.z, pluginConfig.getVictoryReplaceBlock().getId(), pluginConfig.getVictoryReplaceBlock().getMeta());
             } catch (Exception e) {
-                e.printStackTrace();
+                Main.getPlugin().getLogger().error("Error while replacing block", e);
             }
         }
     }

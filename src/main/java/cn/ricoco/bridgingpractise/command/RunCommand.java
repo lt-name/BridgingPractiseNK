@@ -3,21 +3,16 @@ package cn.ricoco.bridgingpractise.command;
 import cn.lanink.gamecore.scoreboard.ScoreboardUtil;
 import cn.lanink.gamecore.utils.Tips;
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
-import cn.nukkit.math.Vector3;
 import cn.ricoco.bridgingpractise.Main;
+import cn.ricoco.bridgingpractise.PluginConfig;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
-import cn.ricoco.bridgingpractise.utils.FileUtils;
 import cn.ricoco.bridgingpractise.utils.Utils;
-import cn.ricoco.bridgingpractise.variable;
-import com.alibaba.fastjson.JSONObject;
 
 public class RunCommand extends Command {
     public RunCommand(String name, String description) {
@@ -46,29 +41,28 @@ public class RunCommand extends Command {
         String levelName = player.getPosition().getLevel().getName();
         String playerName = player.getName();
         PlayerData playerData = Main.getPlugin().getPlayerData(player);
+        PluginConfig pluginConfig = Main.getPlugin().getPluginConfig();
         switch (args[0]) {
             case "join":
-                if (!levelName.equals(Main.getPlugin().getPluginConfig().getLevelName())) {
+                if (!levelName.equals(pluginConfig.getLevelName())) {
                     playerData.setPlayerGameMode(player.getGamemode());
                     playerData.setPlayerInv(player.getInventory().getContents());
                     playerData.setPlayerHunger(player.getFoodData().getLevel());
                     playerData.setBlockSecond(0);
                     playerData.setBlockMax(0);
                     player.getInventory().clearAll();
-                    Utils.addItemToPlayer(player, Main.getPlugin().getPluginConfig().getBlockInfo().toItem());
-                    JSONObject j = variable.configjson.getJSONObject("block").getJSONObject("pickaxe");
-                    Utils.addItemToPlayer(player, Item.get(j.getInteger("id"), j.getInteger("d"), 1));
-                    Position pos = Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(Main.getPlugin().getPluginConfig().getLevelName()));
+                    Utils.addItemToPlayer(player, pluginConfig.getBlockInfo().toItem());
+                    Utils.addItemToPlayer(player, pluginConfig.getPickaxeInfo().toItem());
+                    Position pos = pluginConfig.getSpawnPos();
                     playerData.setPlayerResPos(pos);
                     playerData.setPlayeronresp(false);
                     playerData.setPlayeronelevator(false);
                     playerData.setPlayerLevel(new Exp(player.getExperience(), player.getExperienceLevel()));
                     playerData.setPlayerBlock(0);
                     playerData.setPlayerTime(0);
-                    JSONObject plj = JSONObject.parseObject(FileUtils.readFile("./plugins/BridgingPractise/players/" + playerName + ".json"));
-                    player.setNameTag("§7[§6" + plj.getInteger("level") + "§7]§f" + player.getName());
-                    if (variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("enable")) {
-                        player.setExperience(plj.getInteger("exp"), plj.getInteger("level"));
+                    player.setNameTag("§7[§6" + playerData.getLevel() + "§7]§f" + player.getName());
+                    if (pluginConfig.isEnableLevelSystem()) {
+                        player.setExperience(playerData.getExp(), playerData.getLevel());
                     } else {
                         player.setExperience(0);
                     }
@@ -91,7 +85,7 @@ public class RunCommand extends Command {
                     player.setNameTag(player.getName());
                     ScoreboardUtil.getScoreboard().closeScoreboard(player);
                     Tips.removeTipsConfig(player.getLevel().getFolderName(), player);
-                    player.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("exit").getDouble("z")), Server.getInstance().getLevelByName(variable.configjson.getJSONObject("pos").getJSONObject("exit").getString("l"))));
+                    player.teleport(pluginConfig.getExitPos());
                     sender.sendMessage(Main.language.translateString("leavearena"));
                     PlayerData remove = Main.getPlugin().getPlayerDataMap().remove(player);
                     if (remove != null) {

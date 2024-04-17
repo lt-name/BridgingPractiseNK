@@ -1,7 +1,9 @@
 package cn.ricoco.bridgingpractise;
 
 
+import cn.nukkit.Server;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Position;
 import cn.nukkit.utils.Config;
 import cn.ricoco.bridgingpractise.utils.Utils;
 import com.google.gson.internal.LinkedTreeMap;
@@ -29,6 +31,11 @@ public class PluginConfig {
     private final double lowY;
 
     private final ItemInfo blockInfo;
+    private final ItemInfo pickaxeInfo;
+    /**
+     * 玩家搭路成功后替换的方块
+     */
+    private final ItemInfo victoryReplaceBlock;
     private final ArrayList<Integer> cantPlaceOn;
 
     private final String command;
@@ -47,6 +54,20 @@ public class PluginConfig {
      */
     private final int breakDelay;
 
+    /**
+     * 练习区默认重生点
+     */
+    private final Position spawnPos;
+    /**
+     * 退出后的位置（插件首次加载时读取默认世界出生点）
+     */
+    private final Position exitPos;
+
+    /**
+     * 是否启用等级系统
+     */
+    private final boolean enableLevelSystem;
+
     public PluginConfig(Config config) {
         this.language = config.getString("pra.language");
 
@@ -59,6 +80,9 @@ public class PluginConfig {
         Map<Object, Object> block = config.get("block", new LinkedTreeMap<>());
         Map<Object, Object> pra = (Map<Object, Object>) block.getOrDefault("pra", new LinkedTreeMap<>());
         this.blockInfo = new ItemInfo(Utils.toInt(pra.get("id")), Utils.toInt(pra.get("d")), Utils.toInt(pra.get("c")));
+        Map<Object, Object> pickaxe = (Map<Object, Object>) block.getOrDefault("pickaxe", new LinkedTreeMap<>());
+        this.pickaxeInfo = new ItemInfo(Utils.toInt(pra.get("id")), Utils.toInt(pra.get("d")), 1);
+        this.victoryReplaceBlock = new ItemInfo(config.getInt("pra.victoryreplace.id", 169), config.getInt("pra.victoryreplace.d", 0), 1);
 
         this.cantPlaceOn = new ArrayList<>();
         this.cantPlaceOn.add(Utils.toInt(block.get("stop")));
@@ -73,6 +97,21 @@ public class PluginConfig {
         this.instaBreak = config.getBoolean("pra.instabreak");
         this.breakShowParticle = config.getBoolean("pra.breakparticle");
         this.breakDelay = config.getInt("pra.breakdelay");
+
+        this.spawnPos = new Position(
+                config.getInt("pos.pra.x", 0),
+                config.getInt("pos.pra.y", 0),
+                config.getInt("pos.pra.z", 0),
+                Server.getInstance().getLevelByName(levelName)
+        );
+        this.exitPos = new Position(
+                config.getInt("pos.exit.x", 0),
+                config.getInt("pos.exit.y", 0),
+                config.getInt("pos.exit.z", 0),
+                Server.getInstance().getLevelByName(config.getString("pos.exit.l"))
+        );
+
+        this.enableLevelSystem = config.getBoolean("pra.exp.enable");
     }
 
     @Data
