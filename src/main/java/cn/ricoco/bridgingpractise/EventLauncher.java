@@ -21,7 +21,6 @@ import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
 import cn.ricoco.bridgingpractise.plugin.Exp;
 import cn.ricoco.bridgingpractise.utils.Utils;
-import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
 
@@ -88,7 +87,7 @@ public class EventLauncher implements Listener {
             return;
         }
         Player p = e.getPlayer();
-        if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName()) && !variable.configjson.getJSONObject("pra").getBoolean("candrop")) {
+        if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName()) && !this.plugin.getPluginConfig().isPlayerCanDrop()) {
             e.setCancelled();
             p.sendMessage(Main.language.translateString("cantdrop"));
         }
@@ -109,6 +108,7 @@ public class EventLauncher implements Listener {
             }
             PlayerData playerData = this.plugin.getPlayerData(p);
             int bid = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock().getId();
+            //TODO 改为 switch
             if (bid == variable.configjson.getJSONObject("block").getInteger("res")) {
                 if (!playerData.isPlayeronresp()) {
                     p.sendTitle(Main.language.translateString("setresp"));
@@ -134,6 +134,11 @@ public class EventLauncher implements Listener {
             }
             if (bid == variable.configjson.getJSONObject("block").getInteger("speedup")) {
                 p.setMotion(new Vector3(p.getDirectionVector().x, 0, p.getDirectionVector().z));
+                return;
+            }
+            //TODO 完成重写配置后 把这个方块id加入配置文件
+            if (bid == Block.MELON_BLOCK) {
+                p.setMotion(new Vector3(-p.getDirectionVector().x, 0, -p.getDirectionVector().z));
                 return;
             }
             int eid = variable.configjson.getJSONObject("block").getInteger("elevator");
@@ -180,12 +185,11 @@ public class EventLauncher implements Listener {
                     event.setCancelled();
                 }
                 if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-                    JSONObject json = variable.configjson.getJSONObject("pra");
                     Utils.displayHurt(player);
-                    if (json.getBoolean("iffalllagdmg") && json.getFloat("falllagdmg") <= event.getDamage()) {
+                    if (this.plugin.getPluginConfig().isEnableFallDamageRespawn() && this.plugin.getPluginConfig().getFallDamageThreshold() <= event.getDamage()) {
                         Utils.ClearBL(player, false);
                     }
-                    if (json.getBoolean("falldmgtip")) {
+                    if (this.plugin.getPluginConfig().isEnableFallDamageTip()) {
                         player.sendTitle(Main.language.translateString("falldmgtip", event.getDamage()));
                     }
                 }
@@ -204,7 +208,6 @@ public class EventLauncher implements Listener {
             int bid = b.getSide(BlockFace.DOWN).getId();
             Position floor = b.floor();
             if (!this.plugin.getPluginConfig().getCantPlaceOn().contains(bid) && !this.plugin.getPluginConfig().getCantPlaceOn().contains(Position.fromObject(floor.add(0, -2, 0), b.level).getLevelBlock().getId())) {
-                //b.level.setBlockAt((int) b.x, (int) b.y, (int) b.z, b.getId(), b.getDamage());
                 e.setCancelled(false);
                 Map<Integer, Position> blockPosMap = playerData.getBlockPos();
                 blockPosMap.put(blockPosMap.size() + 1, floor);

@@ -53,6 +53,22 @@ public class PluginConfig {
      * 逐渐清除方块时清除单个方块的延时(ms)
      */
     private final int breakDelay;
+    /**
+     * 玩家是否可以丢出物品
+     */
+    private final boolean playerCanDrop;
+    /**
+     * 是否受到超过阈值的跌落伤害时回到出生点
+     */
+    private final boolean enableFallDamageRespawn;
+    /**
+     * 掉落伤害阈值
+     */
+    private final float fallDamageThreshold;
+    /**
+     * 是否在受到掉落伤害时向玩家发出提示
+     */
+    private final boolean enableFallDamageTip;
 
     /**
      * 练习区默认重生点
@@ -97,6 +113,10 @@ public class PluginConfig {
         this.instaBreak = config.getBoolean("pra.instabreak");
         this.breakShowParticle = config.getBoolean("pra.breakparticle");
         this.breakDelay = config.getInt("pra.breakdelay");
+        this.playerCanDrop = config.getBoolean("pra.candrop");
+        this.enableFallDamageRespawn = config.getBoolean("pra.iffalllagdmg");
+        this.fallDamageThreshold = (float) config.getDouble("pra.falllagdmg");
+        this.enableFallDamageTip = config.getBoolean("pra.falldmgtip");
 
         this.spawnPos = new Position(
                 config.getInt("pos.pra.x", 0),
