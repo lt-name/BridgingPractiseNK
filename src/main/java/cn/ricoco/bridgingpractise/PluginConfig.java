@@ -97,7 +97,7 @@ public class PluginConfig {
         Map<Object, Object> pra = (Map<Object, Object>) block.getOrDefault("pra", new LinkedTreeMap<>());
         this.blockInfo = new ItemInfo(Utils.toInt(pra.get("id")), Utils.toInt(pra.get("d")), Utils.toInt(pra.get("c")));
         Map<Object, Object> pickaxe = (Map<Object, Object>) block.getOrDefault("pickaxe", new LinkedTreeMap<>());
-        this.pickaxeInfo = new ItemInfo(Utils.toInt(pra.get("id")), Utils.toInt(pra.get("d")), 1);
+        this.pickaxeInfo = new ItemInfo(Utils.toInt(pickaxe.get("id")), Utils.toInt(pickaxe.get("d")), 1);
         this.victoryReplaceBlock = new ItemInfo(config.getInt("pra.victoryreplace.id", 169), config.getInt("pra.victoryreplace.d", 0), 1);
 
         this.cantPlaceOn = new ArrayList<>();
