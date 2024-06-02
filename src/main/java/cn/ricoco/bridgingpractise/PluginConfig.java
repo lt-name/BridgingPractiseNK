@@ -2,6 +2,7 @@ package cn.ricoco.bridgingpractise;
 
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.Config;
@@ -22,69 +23,93 @@ import java.util.Map;
 @Getter
 public class PluginConfig {
 
-    private final String language;
+    private final Config config;
 
-    private final String levelName;
+    private String language;
 
-    private final boolean pvpProtect;
+    private String levelName;
 
-    private final double lowY;
+    private boolean pvpProtect;
 
-    private final ItemInfo blockInfo;
-    private final ItemInfo pickaxeInfo;
+    private double lowY;
+
+    private ItemInfo blockInfo;
+    private ItemInfo pickaxeInfo;
     /**
      * 玩家搭路成功后替换的方块
      */
-    private final ItemInfo victoryReplaceBlock;
-    private final ArrayList<Integer> cantPlaceOn;
+    private ItemInfo victoryReplaceBlock;
+    private ArrayList<Integer> cantPlaceOn;
 
-    private final String command;
-    private final List<String> enableCommandList;
+    private String command;
+    private List<String> enableCommandList;
 
     /**
      * 死亡后方块是否直接清除
      */
-    private final boolean instaBreak;
+    private boolean instaBreak;
     /**
      * 清理玩家放置的方块时是否显示破坏方块粒子
      */
-    private final boolean breakShowParticle;
+    private boolean breakShowParticle;
     /**
      * 逐渐清除方块时清除单个方块的延时(ms)
      */
-    private final int breakDelay;
+    private int breakDelay;
     /**
      * 玩家是否可以丢出物品
      */
-    private final boolean playerCanDrop;
+    private boolean playerCanDrop;
     /**
      * 是否受到超过阈值的跌落伤害时回到出生点
      */
-    private final boolean enableFallDamageRespawn;
+    private boolean enableFallDamageRespawn;
     /**
      * 掉落伤害阈值
      */
-    private final float fallDamageThreshold;
+    private float fallDamageThreshold;
     /**
      * 是否在受到掉落伤害时向玩家发出提示
      */
-    private final boolean enableFallDamageTip;
+    private boolean enableFallDamageTip;
 
     /**
      * 练习区默认重生点
      */
-    private final Position spawnPos;
+    private Position spawnPos;
     /**
      * 退出后的位置（插件首次加载时读取默认世界出生点）
      */
-    private final Position exitPos;
+    private Position exitPos;
 
     /**
      * 是否启用等级系统
      */
-    private final boolean enableLevelSystem;
+    private boolean enableLevelSystem;
+
+
+    private int blockRespawn;
+    private int blockStop;
+    private int blockBackSpawn;
+    private int blockSpeedup;
+    private int blockElevator;
+    private int blockKnockBack = Block.MELON_BLOCK; //TODO
 
     public PluginConfig(Config config) {
+        this.config = config;
+        int configVersion = config.getInt("ConfigVersion", 1);
+        switch (configVersion) {
+            case 2:
+                // this.loadV2();
+                break;
+            case 1:
+            default:
+                this.loadV1();
+                break;
+        }
+    }
+
+    public void loadV1() {
         this.language = config.getString("pra.language");
 
         this.levelName = config.getString("pos.pra.l");
@@ -132,6 +157,12 @@ public class PluginConfig {
         );
 
         this.enableLevelSystem = config.getBoolean("pra.exp.enable");
+
+        this.blockRespawn = config.getInt("block.res");
+        this.blockStop = config.getInt("block.stop");
+        this.blockBackSpawn = config.getInt("block.backres");
+        this.blockSpeedup = config.getInt("block.speedup");
+        this.blockElevator = config.getInt("block.elevator");
     }
 
     @Data

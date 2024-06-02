@@ -31,7 +31,7 @@ public class PlayerData {
      */
     private int blockSecond;
     private int blockMax;
-    private Position playerResPos;
+    private Position playerRespawnPos;
     /**
      * 玩家背包map
      */

@@ -109,40 +109,43 @@ public class EventLauncher implements Listener {
             PlayerData playerData = this.plugin.getPlayerData(p);
             int bid = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock().getId();
             //TODO 改为 switch
-            if (bid == variable.configjson.getJSONObject("block").getInteger("res")) {
+            if (bid == pluginConfig.getBlockRespawn()) {
                 if (!playerData.isPlayeronresp()) {
                     p.sendTitle(Main.language.translateString("setresp"));
                     playerData.setPlayeronresp(true);
                     Block bl = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock();
 
-                    playerData.setPlayerResPos(Position.fromObject(new Vector3(bl.x + 0.5, bl.y + 1, bl.z + 0.5), pos.level));
+                    playerData.setPlayerRespawnPos(Position.fromObject(new Vector3(bl.x + 0.5, bl.y + 1, bl.z + 0.5), pos.level));
                     return;
                 }
             } else {
                 playerData.setPlayeronresp(false);
             }
-            if (bid == variable.configjson.getJSONObject("block").getInteger("stop")) {
+            if (bid == pluginConfig.getBlockStop()) {
                 p.sendTitle(Main.language.translateString("completebridge"));
                 Utils.ClearBL(p, true);
                 return;
             }
-            if (bid == variable.configjson.getJSONObject("block").getInteger("backres")) {
+            if (bid == pluginConfig.getBlockBackSpawn()) {
                 p.sendTitle(Main.language.translateString("backresp"));
                 playerData.setPlayeronresp(true);
-                p.teleport(Position.fromObject(new Vector3(variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("x"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("y"), variable.configjson.getJSONObject("pos").getJSONObject("pra").getDouble("z")), Server.getInstance().getLevelByName(pluginConfig.getLevelName())));
+                p.teleport(pluginConfig.getSpawnPos());
                 return;
             }
-            if (bid == variable.configjson.getJSONObject("block").getInteger("speedup")) {
-                p.setMotion(new Vector3(p.getDirectionVector().x, 0, p.getDirectionVector().z));
+            if (bid == pluginConfig.getBlockSpeedup()) {
+                Vector3 directionVector = p.getDirectionVector();
+                if (p.isSprinting()) {
+                    directionVector.setX(directionVector.getX() * 2);
+                    directionVector.setZ(directionVector.getZ() * 2);
+                }
+                p.setMotion(directionVector);
                 return;
             }
-            //TODO 完成重写配置后 把这个方块id加入配置文件
-            if (bid == Block.MELON_BLOCK) {
-                p.setMotion(new Vector3(-p.getDirectionVector().x, 0, -p.getDirectionVector().z));
+            if (bid == pluginConfig.getBlockKnockBack()) {
+                p.setMotion(new Vector3(-p.getDirectionPlane().x * 0.35, 0.4, -p.getDirectionPlane().y/2 * 0.35));
                 return;
             }
-            int eid = variable.configjson.getJSONObject("block").getInteger("elevator");
-            if (bid == eid) {
+            if (bid == pluginConfig.getBlockElevator()) {
                 if (!playerData.isPlayeronelevator()) {
                     playerData.setPlayeronelevator(true);
                     Position tppos = null;
@@ -152,7 +155,7 @@ public class EventLauncher implements Listener {
                         if (i == posy) {
                             continue;
                         }
-                        if (Position.fromObject(new Vector3(posx, i, posz), posl).getLevelBlock().getId() == eid) {
+                        if (Position.fromObject(new Vector3(posx, i, posz), posl).getLevelBlock().getId() == pluginConfig.getBlockElevator()) {
                             tppos = Position.fromObject(new Vector3(posx, i + 1, posz), posl);
                             break;
                         }

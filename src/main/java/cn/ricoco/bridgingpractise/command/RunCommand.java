@@ -54,7 +54,7 @@ public class RunCommand extends Command {
                     Utils.addItemToPlayer(player, pluginConfig.getBlockInfo().toItem());
                     Utils.addItemToPlayer(player, pluginConfig.getPickaxeInfo().toItem());
                     Position pos = pluginConfig.getSpawnPos();
-                    playerData.setPlayerResPos(pos);
+                    playerData.setPlayerRespawnPos(pos);
                     playerData.setPlayeronresp(false);
                     playerData.setPlayeronelevator(false);
                     playerData.setPlayerLevel(new Exp(player.getExperience(), player.getExperienceLevel()));

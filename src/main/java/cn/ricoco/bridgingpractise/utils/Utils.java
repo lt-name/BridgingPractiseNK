@@ -33,7 +33,7 @@ public class Utils {
 
     public static void ClearBL(@NotNull Player player, boolean replaceBlocks) {
         PlayerData playerData = Main.getPlugin().getPlayerData(player);
-        player.teleport(playerData.getPlayerResPos());
+        player.teleport(playerData.getPlayerRespawnPos());
         Map<Integer, Position> blockmap = playerData.getBlockPos();
         int ble = blockmap.size();
         if (replaceBlocks) {
