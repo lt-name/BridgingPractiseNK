@@ -3,7 +3,9 @@ package cn.ricoco.bridgingpractise.utils;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.Sound;
 import cn.nukkit.network.protocol.EntityEventPacket;
+import cn.nukkit.network.protocol.PlaySoundPacket;
 import cn.ricoco.bridgingpractise.Main;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.ClearBlocks;
@@ -51,6 +53,17 @@ public class Utils {
         pk.eid = e.getId();
         pk.event = EntityEventPacket.HURT_ANIMATION;
         e.getViewers().values().forEach((player -> player.dataPacket(pk)));
+    }
+
+    public static void playSound(Player player, Sound sound) {
+        PlaySoundPacket packet = new PlaySoundPacket();
+        packet.name = sound.getSound();
+        packet.volume = 1.0F;
+        packet.pitch = 1.0F;
+        packet.x = player.getFloorX();
+        packet.y = player.getFloorY();
+        packet.z = player.getFloorZ();
+        player.dataPacket(packet);
     }
 
 }

@@ -15,6 +15,7 @@ import cn.nukkit.event.player.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.BlockFace;
 import cn.nukkit.math.Vector3;
 import cn.ricoco.bridgingpractise.data.PlayerData;
@@ -146,13 +147,13 @@ public class EventLauncher implements Listener {
                 return;
             }
             if (bid == pluginConfig.getBlockElevator()) {
-                if (!playerData.isPlayeronelevator()) {
-                    playerData.setPlayeronelevator(true);
+                if (!playerData.isPlayerOnElevator()) {
+                    playerData.setPlayerOnElevator(true);
                     Position tppos = null;
                     double posx = pos.x, posy = pos.y - 1, posz = pos.z;
                     Level posl = pos.level;
-                    for (int i = 0; i < 255; i++) {
-                        if (i == posy) {
+                    for (int i = pos.level.getMinBlockY(); i < pos.level.getMaxBlockY(); i++) {
+                        if (Math.abs(posy - i) < 2) {
                             continue;
                         }
                         if (Position.fromObject(new Vector3(posx, i, posz), posl).getLevelBlock().getId() == pluginConfig.getBlockElevator()) {
@@ -164,10 +165,13 @@ public class EventLauncher implements Listener {
                         p.sendMessage(Main.language.translateString("tpfailed"));
                     } else {
                         p.teleport(tppos);
+                        Server.getInstance().getScheduler().scheduleDelayedTask(this.plugin, () -> {
+                            Utils.playSound(p, Sound.MOB_ENDERMEN_PORTAL);
+                        }, 5);
                     }
                 }
             } else {
-                playerData.setPlayeronelevator(false);
+                playerData.setPlayerOnElevator(false);
             }
         }
     }

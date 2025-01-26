@@ -38,7 +38,7 @@ public class PlayerData {
     private Map<Integer, Item> playerInv;
     private int playerHunger;
     private boolean playeronresp;
-    private boolean playeronelevator;
+    private boolean playerOnElevator;
     private int playerGameMode;
     private Exp playerLevel;
     private int playerBlock;
@@ -89,7 +89,7 @@ public class PlayerData {
         }
         this.playerHunger = 20;
         this.playeronresp = false;
-        this.playeronelevator = false;
+        this.playerOnElevator = false;
         this.playerGameMode = 0;
         this.playerBlock = 0;
         this.playerTime = 0;

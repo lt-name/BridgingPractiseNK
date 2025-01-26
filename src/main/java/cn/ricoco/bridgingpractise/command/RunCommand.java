@@ -56,7 +56,7 @@ public class RunCommand extends Command {
                     Position pos = pluginConfig.getSpawnPos();
                     playerData.setPlayerRespawnPos(pos);
                     playerData.setPlayeronresp(false);
-                    playerData.setPlayeronelevator(false);
+                    playerData.setPlayerOnElevator(false);
                     playerData.setPlayerLevel(new Exp(player.getExperience(), player.getExperienceLevel()));
                     playerData.setPlayerBlock(0);
                     playerData.setPlayerTime(0);
