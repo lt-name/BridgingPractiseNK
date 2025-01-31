@@ -9,6 +9,7 @@ import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.block.BlockBreakEvent;
 import cn.nukkit.event.block.BlockPlaceEvent;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
 import cn.nukkit.event.entity.EntityDamageByEntityEvent;
 import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.event.player.*;
@@ -55,9 +56,13 @@ public class EventLauncher implements Listener {
             ClearBlocks.clearBlocks(playerData.getBlockPos(), true);
 
             player.setGamemode(playerData.getPlayerGameMode());
-            player.getInventory().setContents(playerData.getPlayerInv());
+            if (playerData.getPlayerInv() != null) {
+                player.getInventory().setContents(playerData.getPlayerInv());
+            }
             Exp exp = playerData.getPlayerLevel();
-            player.setExperience(exp.getExp(), exp.getLevel());
+            if (exp != null) {
+                player.setExperience(exp.getExp(), exp.getLevel());
+            }
             player.getFoodData().setLevel(playerData.getPlayerHunger());
             ScoreboardUtil.getScoreboard().closeScoreboard(player);
             player.teleport(this.plugin.getPluginConfig().getExitPos());
@@ -248,6 +253,13 @@ public class EventLauncher implements Listener {
             } else {
                 e.setCancelled();
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCreatureSpawn(CreatureSpawnEvent e) {
+        if (e.getPosition().getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
+            e.setCancelled();
         }
     }
 }
