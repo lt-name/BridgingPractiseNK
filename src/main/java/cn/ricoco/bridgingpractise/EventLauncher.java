@@ -79,7 +79,11 @@ public class EventLauncher implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player p = e.getPlayer();
         if (p.getLevel().getName().equals(this.plugin.getPluginConfig().getLevelName())) {
-            String cmd = e.getMessage().substring(1).split(" ")[0];
+            String[] split = e.getMessage().substring(1).split(" ");
+            if (split.length == 0) {
+                return;
+            }
+            String cmd = split[0];
             if (!this.plugin.getPluginConfig().getEnableCommandList().contains(cmd)) {
                 e.setCancelled();
                 p.sendMessage(Main.language.translateString("cmddisable"));
