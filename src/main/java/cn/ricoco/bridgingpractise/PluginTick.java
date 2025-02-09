@@ -43,7 +43,7 @@ public class PluginTick extends PluginTask<Main> {
         int blockEarnC = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("blockearn").getInteger("bls");
         int blockEarnE = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("blockearn").getInteger("exp");
 
-        while (true) {
+        while (this.owner.isEnabled()) {
             try {
                 Thread.sleep(500);
                 tick++;

@@ -118,7 +118,6 @@ public class EventLauncher implements Listener {
             }
             PlayerData playerData = this.plugin.getPlayerData(p);
             int bid = Position.fromObject(new Vector3(pos.x, pos.y - 1, pos.z), pos.level).getLevelBlock().getId();
-            //TODO 改为 switch
             if (bid == pluginConfig.getBlockRespawn()) {
                 if (!playerData.isPlayeronresp()) {
                     p.sendTitle(Main.language.translateString("setresp"));

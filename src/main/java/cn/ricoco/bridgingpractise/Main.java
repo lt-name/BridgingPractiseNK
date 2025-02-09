@@ -110,6 +110,11 @@ public class Main extends PluginBase {
         } catch (IOException e) {
             this.getLogger().error("Error while copying level", e);
         }
+
+        for (PlayerData playerData : this.playerDataMap.values()) {
+            playerData.save();
+        }
+        this.playerDataMap.clear();
     }
 
     public PluginConfig getPluginConfig() {
