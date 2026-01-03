@@ -6,12 +6,11 @@ import cn.nukkit.block.Block;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
 import cn.nukkit.utils.Config;
-import cn.ricoco.bridgingpractise.utils.Utils;
-import com.google.gson.internal.LinkedTreeMap;
 import lombok.Data;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +85,20 @@ public class PluginConfig {
      * 是否启用等级系统
      */
     private boolean enableLevelSystem;
+    private boolean expScoreboard;
+    private boolean expLevelUp;
+    private boolean expTip;
+    private List<String> scoreboard;
+    private boolean timeEarnEnable;
+    private int timeEarnSec;
+    private int timeEarnExp;
+    private boolean blockEarnEnable;
+    private int blockEarnBlocks;
+    private int blockEarnExp;
 
+    private boolean prompt;
+    private int time;
+    private String weather;
 
     private int blockRespawn;
     private int blockStop;
@@ -98,71 +110,183 @@ public class PluginConfig {
     public PluginConfig(Config config) {
         this.config = config;
         int configVersion = config.getInt("ConfigVersion", 1);
-        switch (configVersion) {
-            case 2:
-                // this.loadV2();
-                break;
-            case 1:
-            default:
-                this.loadV1();
-                break;
+        if (configVersion < 2) {
+            this.migrateV1ToV2();
+            configVersion = 2;
         }
+
+        this.load();
     }
 
-    public void loadV1() {
-        this.language = config.getString("pra.language");
+    public void load() {
+        this.language = config.getString("practice.language");
 
-        this.levelName = config.getString("pos.pra.l");
+        this.levelName = config.getString("positions.practice.level");
 
-        this.pvpProtect = config.getBoolean("pra.pvpprotect");
+        this.pvpProtect = config.getBoolean("practice.pvpProtect");
 
-        this.lowY = config.getDouble("pos.lowy");
+        this.lowY = config.getDouble("positions.lowY");
 
-        Map<Object, Object> block = config.get("block", new LinkedTreeMap<>());
-        Map<Object, Object> pra = (Map<Object, Object>) block.getOrDefault("pra", new LinkedTreeMap<>());
-        this.blockInfo = new ItemInfo(Utils.toInt(pra.get("id")), Utils.toInt(pra.get("d")), Utils.toInt(pra.get("c")));
-        Map<Object, Object> pickaxe = (Map<Object, Object>) block.getOrDefault("pickaxe", new LinkedTreeMap<>());
-        this.pickaxeInfo = new ItemInfo(Utils.toInt(pickaxe.get("id")), Utils.toInt(pickaxe.get("d")), 1);
-        this.victoryReplaceBlock = new ItemInfo(config.getInt("pra.victoryreplace.id", 169), config.getInt("pra.victoryreplace.d", 0), 1);
+        this.blockInfo = new ItemInfo(
+                config.getInt("block.practice.id"),
+                config.getInt("block.practice.meta"),
+                config.getInt("block.practice.count")
+        );
+        this.pickaxeInfo = new ItemInfo(
+                config.getInt("block.pickaxe.id"),
+                config.getInt("block.pickaxe.meta"),
+                1
+        );
+        this.victoryReplaceBlock = new ItemInfo(
+                config.getInt("practice.victoryReplace.id", 169),
+                config.getInt("practice.victoryReplace.meta", 0),
+                1
+        );
 
         this.cantPlaceOn = new ArrayList<>();
-        this.cantPlaceOn.add(Utils.toInt(block.get("stop")));
-        this.cantPlaceOn.add(Utils.toInt(block.get("res")));
-        this.cantPlaceOn.add(Utils.toInt(block.get("speedup")));
-        this.cantPlaceOn.add(Utils.toInt(block.get("backres")));
-        this.cantPlaceOn.add(Utils.toInt(block.get("elevator")));
+        this.cantPlaceOn.add(config.getInt("block.special.stop"));
+        this.cantPlaceOn.add(config.getInt("block.special.respawn"));
+        this.cantPlaceOn.add(config.getInt("block.special.speedUp"));
+        this.cantPlaceOn.add(config.getInt("block.special.backSpawn"));
+        this.cantPlaceOn.add(config.getInt("block.special.elevator"));
 
-        this.command = config.getString("pra.command");
-        this.enableCommandList = config.getStringList("pra.enablecmd");
+        this.command = config.getString("practice.command");
+        this.enableCommandList = config.getStringList("practice.enableCommands");
 
-        this.instaBreak = config.getBoolean("pra.instabreak");
-        this.breakShowParticle = config.getBoolean("pra.breakparticle");
-        this.breakDelay = config.getInt("pra.breakdelay");
-        this.playerCanDrop = config.getBoolean("pra.candrop");
-        this.enableFallDamageRespawn = config.getBoolean("pra.iffalllagdmg");
-        this.fallDamageThreshold = (float) config.getDouble("pra.falllagdmg");
-        this.enableFallDamageTip = config.getBoolean("pra.falldmgtip");
+        this.instaBreak = config.getBoolean("practice.instaBreak");
+        this.breakShowParticle = config.getBoolean("practice.breakParticle");
+        this.breakDelay = config.getInt("practice.breakDelay");
+        this.playerCanDrop = config.getBoolean("practice.canDrop");
+        this.enableFallDamageRespawn = config.getBoolean("practice.fallDamage.enableRespawn");
+        this.fallDamageThreshold = (float) config.getDouble("practice.fallDamage.threshold");
+        this.enableFallDamageTip = config.getBoolean("practice.fallDamage.tip");
 
         this.spawnPos = new Position(
-                config.getInt("pos.pra.x", 0),
-                config.getInt("pos.pra.y", 0),
-                config.getInt("pos.pra.z", 0),
+                config.getDouble("positions.practice.x", 0),
+                config.getDouble("positions.practice.y", 0),
+                config.getDouble("positions.practice.z", 0),
                 Server.getInstance().getLevelByName(levelName)
         );
         this.exitPos = new Position(
-                config.getInt("pos.exit.x", 0),
-                config.getInt("pos.exit.y", 0),
-                config.getInt("pos.exit.z", 0),
-                Server.getInstance().getLevelByName(config.getString("pos.exit.l"))
+                config.getDouble("positions.exit.x", 0),
+                config.getDouble("positions.exit.y", 0),
+                config.getDouble("positions.exit.z", 0),
+                Server.getInstance().getLevelByName(config.getString("positions.exit.level"))
         );
 
-        this.enableLevelSystem = config.getBoolean("pra.exp.enable");
+        this.enableLevelSystem = config.getBoolean("practice.experience.enable");
+        this.expScoreboard = config.getBoolean("practice.experience.scoreboard");
+        this.expLevelUp = config.getBoolean("practice.experience.levelUp");
+        this.expTip = config.getBoolean("practice.experience.tip");
+        this.scoreboard = config.getStringList("practice.scoreboard.lines");
+        this.timeEarnEnable = config.getBoolean("practice.experience.timeEarn.enable");
+        this.timeEarnSec = config.getInt("practice.experience.timeEarn.seconds");
+        this.timeEarnExp = config.getInt("practice.experience.timeEarn.exp");
+        this.blockEarnEnable = config.getBoolean("practice.experience.blockEarn.enable");
+        this.blockEarnBlocks = config.getInt("practice.experience.blockEarn.blocks");
+        this.blockEarnExp = config.getInt("practice.experience.blockEarn.exp");
 
-        this.blockRespawn = config.getInt("block.res");
-        this.blockStop = config.getInt("block.stop");
-        this.blockBackSpawn = config.getInt("block.backres");
-        this.blockSpeedup = config.getInt("block.speedup");
-        this.blockElevator = config.getInt("block.elevator");
+        this.prompt = config.getBoolean("practice.prompt");
+        this.time = config.getInt("practice.time");
+        this.weather = config.getString("practice.weather");
+
+        this.blockRespawn = config.getInt("block.special.respawn");
+        this.blockStop = config.getInt("block.special.stop");
+        this.blockBackSpawn = config.getInt("block.special.backSpawn");
+        this.blockSpeedup = config.getInt("block.special.speedUp");
+        this.blockElevator = config.getInt("block.special.elevator");
+    }
+
+    private void migrateV1ToV2() {
+        LinkedHashMap<String, Object> root = new LinkedHashMap<>();
+        root.put("ConfigVersion", 2);
+
+        Map<String, Object> block = new LinkedHashMap<>();
+        Map<String, Object> practiceBlock = new LinkedHashMap<>();
+        practiceBlock.put("id", config.getInt("block.pra.id"));
+        practiceBlock.put("meta", config.getInt("block.pra.d"));
+        practiceBlock.put("count", config.getInt("block.pra.c"));
+        block.put("practice", practiceBlock);
+
+        Map<String, Object> pickaxe = new LinkedHashMap<>();
+        pickaxe.put("id", config.getInt("block.pickaxe.id"));
+        pickaxe.put("meta", config.getInt("block.pickaxe.d"));
+        block.put("pickaxe", pickaxe);
+
+        Map<String, Object> special = new LinkedHashMap<>();
+        special.put("respawn", config.getInt("block.res"));
+        special.put("stop", config.getInt("block.stop"));
+        special.put("speedUp", config.getInt("block.speedup"));
+        special.put("backSpawn", config.getInt("block.backres"));
+        special.put("elevator", config.getInt("block.elevator"));
+        block.put("special", special);
+        root.put("block", block);
+
+        Map<String, Object> positions = new LinkedHashMap<>();
+        positions.put("lowY", config.getDouble("pos.lowy"));
+        Map<String, Object> practicePos = new LinkedHashMap<>();
+        practicePos.put("x", config.getDouble("pos.pra.x"));
+        practicePos.put("y", config.getDouble("pos.pra.y"));
+        practicePos.put("z", config.getDouble("pos.pra.z"));
+        practicePos.put("level", config.getString("pos.pra.l"));
+        positions.put("practice", practicePos);
+        Map<String, Object> exitPos = new LinkedHashMap<>();
+        exitPos.put("x", config.getDouble("pos.exit.x"));
+        exitPos.put("y", config.getDouble("pos.exit.y"));
+        exitPos.put("z", config.getDouble("pos.exit.z"));
+        exitPos.put("level", config.getString("pos.exit.l"));
+        positions.put("exit", exitPos);
+        root.put("positions", positions);
+
+        Map<String, Object> practice = new LinkedHashMap<>();
+        practice.put("language", config.getString("pra.language"));
+        practice.put("pvpProtect", config.getBoolean("pra.pvpprotect"));
+        practice.put("prompt", config.getBoolean("pra.prompt"));
+        practice.put("time", config.getInt("pra.time"));
+        practice.put("weather", config.getString("pra.weather"));
+        practice.put("command", config.getString("pra.command"));
+        practice.put("enableCommands", config.getStringList("pra.enablecmd"));
+        practice.put("instaBreak", config.getBoolean("pra.instabreak"));
+        practice.put("breakParticle", config.getBoolean("pra.breakparticle"));
+        practice.put("breakDelay", config.getInt("pra.breakdelay"));
+        practice.put("canDrop", config.getBoolean("pra.candrop"));
+
+        Map<String, Object> victoryReplace = new LinkedHashMap<>();
+        victoryReplace.put("id", config.getInt("pra.victoryreplace.id", 169));
+        victoryReplace.put("meta", config.getInt("pra.victoryreplace.d", 0));
+        practice.put("victoryReplace", victoryReplace);
+
+        Map<String, Object> fallDamage = new LinkedHashMap<>();
+        fallDamage.put("enableRespawn", config.getBoolean("pra.iffalllagdmg"));
+        fallDamage.put("threshold", config.getDouble("pra.falllagdmg"));
+        fallDamage.put("tip", config.getBoolean("pra.falldmgtip"));
+        practice.put("fallDamage", fallDamage);
+
+        Map<String, Object> experience = new LinkedHashMap<>();
+        experience.put("enable", config.getBoolean("pra.exp.enable"));
+        experience.put("scoreboard", config.getBoolean("pra.exp.scoreboard"));
+        experience.put("levelUp", config.getBoolean("pra.exp.levelup"));
+        experience.put("tip", config.getBoolean("pra.exp.getexp"));
+        Map<String, Object> timeEarn = new LinkedHashMap<>();
+        timeEarn.put("enable", config.getBoolean("pra.exp.timeearn.enable"));
+        timeEarn.put("seconds", config.getInt("pra.exp.timeearn.sec"));
+        timeEarn.put("exp", config.getInt("pra.exp.timeearn.exp"));
+        experience.put("timeEarn", timeEarn);
+        Map<String, Object> blockEarn = new LinkedHashMap<>();
+        blockEarn.put("enable", config.getBoolean("pra.exp.blockearn.enable"));
+        blockEarn.put("blocks", config.getInt("pra.exp.blockearn.bls"));
+        blockEarn.put("exp", config.getInt("pra.exp.blockearn.exp"));
+        experience.put("blockEarn", blockEarn);
+        practice.put("experience", experience);
+
+        Map<String, Object> scoreboard = new LinkedHashMap<>();
+        scoreboard.put("lines", config.getStringList("pra.scoreboard"));
+        practice.put("scoreboard", scoreboard);
+
+        root.put("practice", practice);
+
+        config.setAll(root);
+        config.save();
     }
 
     @Data

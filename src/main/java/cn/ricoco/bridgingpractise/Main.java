@@ -12,7 +12,6 @@ import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.plugin.MetricsLite;
 import cn.ricoco.bridgingpractise.utils.FileUtils;
 import cn.ricoco.bridgingpractise.utils.LevelUtils;
-import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +64,6 @@ public class Main extends PluginBase {
         if (!new File(this.getDataFolder() + "/lang/zh_cn.json").exists()) {
             FileUtils.ReadJar("resources/lang/zh_cn.json", this.getDataFolder() + "/lang/zh_cn.json");
         }
-        variable.configjson = JSONObject.parseObject(FileUtils.readFile(this.getDataFolder() + "/config.json"));
         this.pluginConfig = new PluginConfig(new Config(this.getDataFolder() + "/config.json", Config.JSON));
 
         //加载语言文件

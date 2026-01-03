@@ -1,48 +1,51 @@
 {
-    "block":{
-        "pra":{"id":24,"d":0,"c":64},
-        "stop":152,
-        "res":133,
-        "speedup":41,
-        "backres":22,
-        "elevator":138,
-        "pickaxe":{"id":278,"d":0}
+    "ConfigVersion": 2,
+    "block": {
+        "practice": {"id": 24, "meta": 0, "count": 64},
+        "pickaxe": {"id": 278, "meta": 0},
+        "special": {
+            "respawn": 133,
+            "stop": 152,
+            "speedUp": 41,
+            "backSpawn": 22,
+            "elevator": 138
+        }
     },
-    "pos":{
-        "lowy":0.0,
-        "pra":{"x":4.5,"y":24.0,"z":10.5,"l":"bpractise"},
-        "exit":{"x":%1,"y":%2,"z":%3,"l":"%4"}
+    "positions": {
+        "lowY": 0.0,
+        "practice": {"x": 4.5, "y": 24.0, "z": 10.5, "level": "bpractise"},
+        "exit": {"x": %1, "y": %2, "z": %3, "level": "%4"}
     },
-    "pra":{
-        "language":"en_us",
-        "instabreak":false,
-        "breakparticle":true,
-        "breakdelay":150,
-        "falldmgtip":true,
-        "falllagdmg":20,
-        "iffalllagdmg":true,
-        "pvpprotect":false,
-        "candrop":false,
-        "prompt":true,
-        "time":700,
-        "weather":"clear",
-        "command":"bpractise",
-        "enablecmd":["bpractise"],
-        "victoryreplace": {"id": 169,"d": 0},
-        "exp": {
+    "practice": {
+        "language": "en_us",
+        "pvpProtect": false,
+        "prompt": true,
+        "time": 700,
+        "weather": "clear",
+        "command": "bpractise",
+        "enableCommands": ["bpractise"],
+        "instaBreak": false,
+        "breakParticle": true,
+        "breakDelay": 150,
+        "canDrop": false,
+        "victoryReplace": {"id": 169, "meta": 0},
+        "fallDamage": {"enableRespawn": true, "threshold": 20, "tip": true},
+        "experience": {
             "enable": true,
             "scoreboard": true,
-            "levelup": true,
-            "getexp": true,
-            "timeearn": {"enable":true,"sec": 30,"exp": 5},
-            "blockearn": {"enable":true,"bls": 50,"exp": 10}
+            "levelUp": true,
+            "tip": true,
+            "timeEarn": {"enable": true, "seconds": 30, "exp": 5},
+            "blockEarn": {"enable": true, "blocks": 50, "exp": 10}
         },
-        "scoreboard": [
-            "§fName: §a%player%",
-            "§fLevel: §b%level%",
-            "§fProcess: §b%lowProgcess%§f/§a%maxProgcess%",
-            "Placed: §a%placed%",
-            "§6§lMineBBS.com"
-        ]
+        "scoreboard": {
+            "lines": [
+                "§fName: §a%player%",
+                "§fLevel: §b%level%",
+                "§fProcess: §b%lowProgcess%§f/§a%maxProgcess%",
+                "Placed: §a%placed%",
+                "§6§lMineBBS.com"
+            ]
+        }
     }
 }

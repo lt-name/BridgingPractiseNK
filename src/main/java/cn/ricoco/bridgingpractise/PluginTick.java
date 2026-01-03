@@ -8,10 +8,10 @@ import cn.nukkit.scheduler.PluginTask;
 import cn.ricoco.bridgingpractise.data.PlayerData;
 import cn.ricoco.bridgingpractise.utils.ExpUtils;
 import cn.ricoco.bridgingpractise.utils.LevelUtils;
-import com.alibaba.fastjson.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class PluginTick extends PluginTask<Main> {
 
@@ -23,25 +23,26 @@ public class PluginTick extends PluginTask<Main> {
 
     @Override
     public void onRun(int t) {
+        PluginConfig pluginConfig = this.owner.getPluginConfig();
         String promptstr = Main.language.translateString("prompt");
-        String levelName = this.owner.getPluginConfig().getLevelName();
-        String weatherstr = variable.configjson.getJSONObject("pra").getString("weather");
-        int ltime = variable.configjson.getJSONObject("pra").getInteger("time");
-        Boolean prompt = variable.configjson.getJSONObject("pra").getBoolean("prompt");
-        Boolean expSystem = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("enable");
-        Boolean lvUp = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("levelup");
-        Boolean expTip = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("getexp");
-        Boolean scoreb = variable.configjson.getJSONObject("pra").getJSONObject("exp").getBoolean("scoreboard");
+        String levelName = pluginConfig.getLevelName();
+        String weatherstr = pluginConfig.getWeather();
+        int ltime = pluginConfig.getTime();
+        boolean prompt = pluginConfig.isPrompt();
+        boolean expSystem = pluginConfig.isEnableLevelSystem();
+        boolean lvUp = pluginConfig.isExpLevelUp();
+        boolean expTip = pluginConfig.isExpTip();
+        boolean scoreb = pluginConfig.isExpScoreboard();
         int SBCount = 0;
         String sbTitle = Main.language.translateString("sbtitle");
         String[] sbTitleL = Main.language.translateString("sbtitle").split("");
-        JSONArray SBThing = variable.configjson.getJSONObject("pra").getJSONArray("scoreboard");
-        Boolean timeEarn = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getBoolean("enable");
-        int timeEarnC = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getInteger("sec");
-        int timeEarnE = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("timeearn").getInteger("exp");
-        Boolean blockEarn = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("blockearn").getBoolean("enable");
-        int blockEarnC = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("blockearn").getInteger("bls");
-        int blockEarnE = variable.configjson.getJSONObject("pra").getJSONObject("exp").getJSONObject("blockearn").getInteger("exp");
+        List<String> SBThing = pluginConfig.getScoreboard();
+        boolean timeEarn = pluginConfig.isTimeEarnEnable();
+        int timeEarnC = pluginConfig.getTimeEarnSec();
+        int timeEarnE = pluginConfig.getTimeEarnExp();
+        boolean blockEarn = pluginConfig.isBlockEarnEnable();
+        int blockEarnC = pluginConfig.getBlockEarnBlocks();
+        int blockEarnE = pluginConfig.getBlockEarnExp();
 
         while (this.owner.isEnabled()) {
             try {
@@ -105,8 +106,8 @@ public class PluginTick extends PluginTask<Main> {
                             ArrayList<String> arr = new ArrayList<>();
                             String SB_Player = p.getName(), SB_Level = playerData.getLevel() + "", SB_LowProgcess = playerData.getExp() + "", SB_MaxProgcess = ExpUtils.calcNeedExp(playerData.getLevel() + 1) + "", SB_Placed = playerData.getPlace() + "";
                             p.setNameTag("§7[e" + SB_Level + "§7]§f" + p.getName());
-                            for (int i = 0; i < SBThing.size(); i++) {
-                                arr.add(SBThing.getString(i).replaceAll("%player", SB_Player).replaceAll("%level%", SB_Level).replaceAll("%lowProgcess%", SB_LowProgcess).replaceAll("%maxProgcess%", SB_MaxProgcess).replaceAll("%placed%", SB_Placed));
+                            for (String line : SBThing) {
+                                arr.add(line.replaceAll("%player", SB_Player).replaceAll("%level%", SB_Level).replaceAll("%lowProgcess%", SB_LowProgcess).replaceAll("%maxProgcess%", SB_MaxProgcess).replaceAll("%placed%", SB_Placed));
                             }
                             ScoreboardUtil.getScoreboard().showScoreboard(p, SB_Title, arr);
                         }
