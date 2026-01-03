@@ -1,176 +1,93 @@
-# BridgingPractiseNK  
-  
-This is a bridging practise plugin helps you practise your bridging ability.  
-一个帮助你练习搭路的插件  
-  
-# 介绍  
-  
-## 简体中文  
-  
-### 指令  
-  
-(默认/bpractise可在config.json中修改)  
-/bpractise join 加入练习区  
-/bpractise leave 离开练习区  
-  
-### 警告  
-  
-1.不要让MobPlugin在练习区生成生物,否则会空指针  
-2.不要乱动./plugins/BridgingPractise/cache下的地图备份文件  
-3.关服请用stop命令关服,不要点X,否则可能会导致一些未知的问题  
-4.初始化前请保证没有名为“bpractise”的地图,否则将被覆盖  
-  
-### 配置文件  
-  
-config.json键值说明:  
-  
-#### block  
-  
-block 搭路用方块(id:物品id,d:物品特殊值,c:物品数量)  
-stop 结束点方块id  
-res 重生点设置方块id  
-speedup 加速方块id  (经过此方块会将玩家向前弹射一小段距离)
-backres 回出生点方块id  
-elevator 电梯方块id(需在同一x,z坐标不同高度有2个这种方块,站在其中一个方块上即可传送到另一个)  
-pickaxe 搞(id:物品id,d:物品特殊值)  
-  
-#### pos  
-  
-lowy 最低y坐标(低于将被拉回重生点)  
-pra 练习区坐标(x:x坐标,y:y坐标,z:z坐标,l:世界名)  
-exit 退出后回到的坐标(x:x坐标,y:y坐标,z:z坐标,l:世界名)(初始化时会使用主世界安全重生点)  
-  
-#### pra  
-  
-language 语言文件(对应./plugins/BridgingPractise/lang/值.json)(假如没有会在控制台警告并读取英文的语言文件)  
-instabreak 死亡后方块是否直接清除(true直接清除,false逐渐清除)  
-breakparticle 清除方块是否掉落粒子  
-breakdelay 逐渐清除方块时清除单个方块的延时(ms)  
-falldmgtip 是否在受到掉落伤害时向玩家发出提示  
-iffalllagdmg 是否受到超过阈值的跌落伤害时回到出生点  
-pvpprotect pvp保护  
-candrop 玩家能否扔物品  
-prompt 是否向玩家发送搭路方块速度,距离,最远距离信息的Popup提示
-time 锁定练习区世界的时间  
-weather 锁定练习区世界的天气(clear,rain,thunder)  
-command 搭路练习指令名(/值 join/leave)  
-enablecmd 练习区允许的指令(需包含插件指令否则玩家无法退出)(取指令名例如/kill @e就是kill)  
-enable - 启用等级系统  
-scoreboard - 显示积分版（需启动等级系统）  
-levelup - 升级提示  
-getexp - 获得经验提示  
-timeearn - 时间奖励(enable开关，sec时长，exp获得的经验)  
-blockearn - 方块奖励(enable-开关,bls-需要的方块,exp-获得的经验)  
-  
-## English  
-  
-sorry my english is bad.  
-  
-### Commands  
-  
-default:/bpractise,can change in config.json  
-/bpractise join - Join the practise area  
-/bpractise leave - Leave the practise area  
-  
-### Warning  
-  
-1.DON'T LET MobPlugin GENERATE MOBS AT PRACTISE AREA  
-2.DON'T MODIFY LEVEL BACKUP FILE AT ./plugins/BridgingPractise/cache  
-3.PLEASE USE 'stop' COMMAND TO STOP THE SERVER,DON'T CLICK "X" TO STOP  
-4.PLEASE MAKE SURE THAT THERE IS NO LEVEL NAMED "BPRACTISE" BEFORE INITIALIZATION, OTHERWISE IT WILL BE OVERWRITTEN  
-  
-### Config File  
-  
-config.json keys:  
-  
-#### block  
-  
-block - Block used to bridging(id:item id,d:item data id/damage,c:item count)  
-stop - Stop point block id  
-res - respawn point block id  
-speedup - speedup block id  
-backres - back-to-respawn block id  
-elevator - elevator block id(Need to have 2 such blocks at the same x, z coordinates and different heights, stand on one of them and you can teleport to the other)  
-pickaxe - pickaxe(id:item id,d:item data id/damage)  
-  
-#### pos  
-  
-lowy - Lowest y position(Below will be pulled back to the respawn point)  
-pra - Practise Position(x:x position,y:y position,z:z position,l:Level name)  
-exit - The Position when return back(x:x position,y:y position,z:z position,l:Level name)(The main world safe respawn point will be used during initialization)  
-  
-#### pra  
-  
-language - Language File(Corresponding to ./plugins/BridgingPractise/lang/value.json) (if the file is not exists will warning in the console and read the English language file)  
-instabreak - Will cleared directly when player death?(true is cleared directly, false is cleared gradually)  
-breakparticle - Will drop down particles when block break?  
-breakdelay - delay time when clear blocks gradually(ms)  
-falldmgtip - Will warn player when take damage from falling  
-iffalllagdmg - Will to return to the spawn point when receiving fall damage that exceeds the threshold  
-pvpprotect - PvP Protection in the Practise area  
-candrop - Can players drop items in the Practise area  
-prompt - Will send popup prompts to players about the speed, distance, and farthest distance  
-speedlv - The level of speed effect obtained by standing on the speedup block  
-speedtick - Time to get the speed effect by standing on the speedup block(tick)  
-time - Lock the time in the practice area world(int Time)  
-weather - Lock the weather in the practice area world(clear,rain,thunder)  
-command - Command of bridging practise plugin(/value join/leave)  
-enablecmd - Commands allowed in the practice area(plugin commands must be included or the player cannot exit) (use the command name for example /kill @e is kill)
-enable - Enable the player Levelling System  
-scoreboard - Enable scoreboard(Need to enable levelling system)  
-levelup - LevelUP Prompt  
-getexp - GetExp Prompt  
-timeearn - “Time-Played" Exp (enable-enable?,sec-time,exp-earnd exp)  
-blockearn - exp earn when place block(enable-enable?,bls-need blocks,exp-earnd exp)  
-  
-# Update  
-  
-## Update 1.2 from 1.0/1.1  
-  
-从1.0/1.1升级插件  
-why i not put auto-update?  
-because it will lost the format of JSON  
-为什么不做一个自动升级配置文件？  
-因为会丢失json的格式  
-  
-### config.json  
-  
-All modify is in key "pra"  
-所有的修改都在pra键里  
-~~~  
-"victoryreplace": {"id": 169,"d": 0},  
-"exp": {  
-    "enable": true,  
-    "scoreboard": true,  
-    "levelup": true,  
-    "getexp": true,  
-    "timeearn": {"enable":true,"sec": 30,"exp": 5},  
-    "blockearn": {"enable":true,"bls": 50,"exp": 10}  
-},  
-"scoreboard": [  
-    "§fName: §a%player%",  
-    "§fLevel: §b%level%",  
-    "§fProcess: §b%lowProgcess%§f/§a%maxProgcess%",  
-    "Placed: §a%placed%",  
-    "§6§lMineBBS.com"  
-]  
-~~~  
-victoryreplace - 玩家搭路成功之后将玩家的方块替换成的方块  
-victoryreplace - Replaced block when player completed the bridge  
-scoreboard - 积分版内容  
-scoreboard - Scoreboard Text  
-  
-#### exp  
-  
-enable - 启用等级系统  
-enable - Enable the player Levelling System  
-scoreboard - 显示积分版（需启动等级系统）  
-scoreboard - Enable scoreboard(Need to enable levelling system)  
-levelup - 升级提示  
-levelup - LevelUP Prompt  
-getexp - 获得经验提示  
-getexp - GetExp Prompt  
-timeearn - 时间奖励(enable开关，sec时长，exp获得的经验)  
-timeearn - “Time-Played" Exp (enable-enable?,sec-time,exp-earnd exp)  
-blockearn - 方块奖励(enable-开关,bls-需要的方块,exp-获得的经验)  
-blockearn - exp earn when place block(enable-enable?,bls-need blocks,exp-earnd exp)  
+# BridgingPractiseNK
+
+[Chinese](README.zh.md) | English
+
+Bridging practice plugin for Nukkit. Provides a dedicated practice world, block-based checkpoints, and optional leveling/scoreboard.
+
+## Requirements
+
+- Nukkit
+- Dependency: MemoriesOfTime-GameCore
+
+## Install
+
+1. Place the plugin jar in `plugins/`.
+2. Install `MemoriesOfTime-GameCore`.
+3. Start the server once to generate `plugins/BridgingPractise/config.json` and language files.
+4. Edit `plugins/BridgingPractise/config.json` to fit your world and rules.
+
+## Commands
+
+- `/bpractise join` - Join the practice area.
+- `/bpractise leave` - Leave the practice area.
+
+Command name is configurable via `practice.command`.
+
+## Features
+
+- Auto-copy and restore the practice world on shutdown.
+- Practice blocks: respawn, stop, back-to-spawn, speedup, elevator.
+- Optional level/experience system with scoreboard.
+- Popup prompts for speed/distance stats.
+- PvP protection, mob spawn blocking, and command whitelist.
+
+## Config (config.json)
+
+Top-level:
+
+- `ConfigVersion`: current format version (2).
+- `block`: practice block info and special blocks.
+- `positions`: practice world location, exit location, and low-Y fallback.
+- `practice`: language, rules, prompts, experience, and scoreboard.
+
+`block`:
+
+- `block.practice`: practice block (`id`, `meta`, `count`).
+- `block.pickaxe`: practice pickaxe (`id`, `meta`).
+- `block.special.respawn`: respawn checkpoint block id.
+- `block.special.stop`: finish block id.
+- `block.special.speedUp`: speedup block id.
+- `block.special.backSpawn`: back-to-spawn block id.
+- `block.special.elevator`: elevator block id.
+
+`positions`:
+
+- `positions.lowY`: below this Y, player is pulled back to respawn.
+- `positions.practice`: practice spawn (`x`, `y`, `z`, `level`).
+- `positions.exit`: exit location after leaving (`x`, `y`, `z`, `level`).
+
+`practice`:
+
+- `practice.language`: language file in `plugins/BridgingPractise/lang/` (e.g. `en_us`).
+- `practice.command`: command name (default `bpractise`).
+- `practice.enableCommands`: allowed commands while in practice world.
+- `practice.pvpProtect`: block PvP damage.
+- `practice.prompt`: show popup prompt.
+- `practice.time`: lock world time.
+- `practice.weather`: lock world weather (`clear`, `rain`, `thunder`).
+- `practice.instaBreak`: clear blocks instantly on death.
+- `practice.breakParticle`: show break particles.
+- `practice.breakDelay`: delay between block clears (ms).
+- `practice.canDrop`: allow item drops.
+- `practice.victoryReplace`: block replaced after completing a bridge (`id`, `meta`).
+- `practice.fallDamage.enableRespawn`: respawn on heavy fall damage.
+- `practice.fallDamage.threshold`: damage threshold to respawn.
+- `practice.fallDamage.tip`: show fall damage tips.
+- `practice.experience.enable`: enable leveling system.
+- `practice.experience.scoreboard`: enable scoreboard display.
+- `practice.experience.levelUp`: show level up prompt.
+- `practice.experience.tip`: show exp gain prompt.
+- `practice.experience.timeEarn`: exp for time played (`enable`, `seconds`, `exp`).
+- `practice.experience.blockEarn`: exp for placed blocks (`enable`, `blocks`, `exp`).
+- `practice.scoreboard.lines`: scoreboard lines.
+
+Scoreboard placeholders:
+
+- `%player%`, `%level%`, `%lowProgcess%`, `%maxProgcess%`, `%placed%`
+
+## Notes
+
+- Do not modify `plugins/BridgingPractise/cache/` manually.
+- Use the `stop` command to shut down the server so the world can restore cleanly.
+- Ensure no world named `bpractise` exists before first startup (it will be overwritten).
+- Avoid other plugins spawning mobs in the practice world.
